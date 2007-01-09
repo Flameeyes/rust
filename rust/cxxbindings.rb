@@ -31,34 +31,10 @@ module Rust
       "hh"
     end
 
-    def initialize(name)
-      super(name)
+    def include_header(name)
+      name = "<#{name}>" unless name =~ /^".*"$/
 
-      @namespaces = Array.new
+      @cxx_includes << "\n#include #{name}"
     end
-
-    def add_namespace(name, cxxname = nil)
-      cxxname = name if cxxname == nil 
-
-      ns = Namespace.new(name, cxxname)
-
-      yield ns
-
-      @namespaces << ns
-    end
-
-    def unit
-      @namespaces.collect { |ns| ns.unit }.join("\n")
-    end
-
-    def header
-      @namespaces.collect { |ns| ns.header }.join("\n")
-    end
-
-    def init
-      @namespaces.collect { |ns| ns.init }.join("\n")
-    end
-
   end
-
 end

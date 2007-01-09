@@ -28,33 +28,30 @@ module Rust
     def initialize(name, cxxname)
       @name = name
       @cxxname = cxxname
+
+      @cxxclasses = Array.new
+      @cwrappers = Array.new
     end
 
     def varname
       "m#{@name.gsub("::", "_")}"
     end
 
-    def header
-      ret = "extern VALUE #{varname};\n"
-      
-      #    @classes.each { |cls|
-      #      ret << cls.header
-      #    }
-      
-      ret << "\n"
+    def declaration
+      ModuleDeclarations.
+        gsub("!module_name!", @name).
+        gsub("!cxx_classes_declarations!", @cxxclasses.collect { |klass| klass.declaration }.join("\n")).
+        gsub("!c_class_wrappers_declarations!", @cwrappers.collect { |klass| klass.declaration }.join("\n"))
     end
     
-    def unit
-      ret = "VALUE #{varname};\n"
-      
-      #    @classes.each { |cls|
-      #      ret << cls.unit
-      #    }
-      
-      ret << "\n"
+    def definition
+      ModuleDefinitions.
+        gsub("!module_name!", @name).
+        gsub("!cxx_classes_definitions!", @cxxclasses.collect { |klass| klass.definition }.join("\n")).
+        gsub("!c_class_wrappers_definitions!", @cwrappers.collect { |klass| klass.definition }.join("\n"))
     end
     
-    def init
+    def initialization
       unless @name.include?("::")
         ret = "#{varname} = rb_define_module(\"#{@name}\");\n"
       else

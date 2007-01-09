@@ -27,11 +27,10 @@ module Rust
 
     def initialize(name)
       @name = name
-    end
 
-    def headers
-      "#include <rust_conversions.#{extension_header}>\n" +
-        "#include \"#{@name}.#{extension_header}\"\n"
+      @modules = Array.new
+      @cxx_includes = ""
+      @c_includes = ""
     end
 
     def Bindings.create_bindings(type, name)
@@ -48,17 +47,41 @@ module Rust
       header = File.new("#{name}.#{bindings.extension_header}", "w")
       unit = File.new("#{name}.#{bindings.extension_unit}", "w")
       
-      header.puts BaseIncludes
-      unit.puts bindings.headers
-
       header.puts bindings.header
       unit.puts bindings.unit
-
-      unit.puts InitFunction.gsub("!bindingsname!", name).gsub("!initfunction_body!", bindings.init)
     end
 
+    def add_namespace(name, cxxname = nil)
+      cxxname = name if cxxname == nil 
+
+      ns = Namespace.new(name, cxxname)
+
+      yield ns
+
+      @modules << ns
+    end
+
+    def add_module(name)
+      add_namespace(name, nil)
+    end
+
+    def header
+      BindingsHeader.
+        gsub("!bindings_name!", @name).
+        gsub("!modules_declaration!", @modules.collect { |ns| ns.declaration }.join("\n")).
+        gsub("!cxx_includes!", @cxx_includes).
+        gsub("!c_includes!", @c_includes)
+    end
+
+    def unit
+      BindingsUnit.
+        gsub("!bindings_name!", @name).
+        gsub("!modules_initialization!", @modules.collect { |ns| ns.initialization }.join("\n")).
+        gsub("!modules_definition!", @modules.collect { |ns| ns.definition }.join("\n"))
+    end
   end
 
 end
 
 require 'rust/cxxbindings'
+

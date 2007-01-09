@@ -22,7 +22,3 @@
 
 require 'rust/templates'
 require 'rust/bindings'
-
-module Rust
-
-end

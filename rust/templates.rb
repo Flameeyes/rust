@@ -21,32 +21,56 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 module Rust
-  BaseIncludes = 
+  BindingsHeader  = 
 %@
-#include <ruby.h>
-#include <map> /* This is for the ptrMap */
+extern "C" {
+  #include <ruby.h>
+  !c_includes!
+}
+
+!cxx_includes!
+
+/* This is for the ptrMap */
+#include <map>
+
+!modules_declaration!
 
 @
 
-  InitFunction =
+  BindingsUnit =
 %@
 
-#ifdef __cplusplus
+#include <rust_conversions.hh>
+#include "!bindings_name!.hh"
+
+!modules_definition!
+
 extern "C" {
-#endif
 
 #ifdef HAVE_VISIBILITY
-void Init_!bindingsname!() __attribute__((visibility("default")));
+void Init_!bindings_name!() __attribute__((visibility("default")));
 #endif
 
-void Init_!bindingsname!() {
-!initfunction_body!
-} /* Init_!bindingsname! */
+void Init_!bindings_name!() {
+!modules_initialization!
+} /* Init_!bindings_name! */
 
-#ifdef __cplusplus
 }
-#endif
 
+@
+
+  ModuleDeclarations = 
+%@
+extern VALUE !module_name!;
+!cxx_classes_declarations!
+!c_class_wrappers_declarations!
+@
+
+  ModuleDefinitions = 
+%@
+VALUE !module_name!;
+!cxx_classes_definitions!
+!c_class_wrappers_definitions!
 @
 
 end
