@@ -66,14 +66,14 @@ if ( dynamic_cast< #{klass.ns.cxxname}::#{klass.name}* >(instance) != NULL )
 
 
     def declaration
-      CxxClassDeclarations.
+      (CxxClassDeclarations + (@parent ? "" : CxxStandaloneClassDeclarations )).
         gsub("!class_varname!", varname).
         gsub("!cxx_class_name!", "#{@ns.cxxname}::#{@name}").
         gsub("!class_ptrmap!", ptrmap)
     end
     
     def definition
-      CxxClassDefinitions.
+      (CxxClassDefinitions + (@parent ? "" : CxxStandaloneClassDefinitions )).
         gsub("!class_varname!", varname).
         gsub("!cxx_class_name!", "#{@ns.cxxname}::#{@name}").
         gsub("!class_ptrmap!", ptrmap).

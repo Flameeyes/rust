@@ -127,4 +127,25 @@ static VALUE !class_varname!_alloc(VALUE self) {
 }
 @
 
+  CxxStandaloneClassDeclarations =
+%@
+typedef std::map<VALUE, !cxx_class_name!*> T!class_ptrmap!;
+extern T!class_ptrmap! !class_ptrmap!;
+static void !class_varname!_free(void *p);
+@
+
+  CxxStandaloneClassDefinitions = 
+%@
+T!class_ptrmap! !class_ptrmap!;
+
+static void !class_varname!_free(void *p) {
+  T!class_ptrmap!::iterator it, eend = !class_ptrmap!.end();
+  for(it = !class_ptrmap!.begin(); it != eend; it++)
+     if ( (*it).second == (!cxx_class_name!*)p ) {
+        !class_ptrmap!.erase(it); break;
+     }
+  delete (!cxx_class_name!*)p;
+}
+@
+
 end
