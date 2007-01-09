@@ -26,5 +26,7 @@ Rust::Bindings::create_bindings(Rust::Bindings::CXX, "cppclass_rb") { |b|
   b.include_header '"cppclass.hh"'
 
   b.add_namespace("RustTest", "") { |ns|
+    ns.add_cxx_class("TestClass") { |klass|
+    }
   }
 }

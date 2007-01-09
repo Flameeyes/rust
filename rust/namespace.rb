@@ -20,6 +20,8 @@
 # CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+require "rust/cxxclass"
+
 module Rust
 
   class Namespace
@@ -31,6 +33,15 @@ module Rust
 
       @cxxclasses = Array.new
       @cwrappers = Array.new
+    end
+
+    def add_cxx_class(name, parent = nil)
+      klass = CxxClass.new(name, self, parent)
+
+      yield klass
+
+      @cxxclasses << klass
+      return klass
     end
 
     def varname

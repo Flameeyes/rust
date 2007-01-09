@@ -73,4 +73,58 @@ VALUE !module_name!;
 !c_class_wrappers_definitions!
 @
 
+  CxxClassDeclarations = 
+%@
+extern VALUE c!class_varname!;
+VALUE cxx2ruby(!cxx_class_name!* instance);
+!cxx_class_name!* ruby2!class_varname!Ptr(VALUE rval);
+@
+
+  CxxClassDefinitions =
+%@
+VALUE c!class_varname!;
+
+!cxx_class_name!* ruby2!class_varname!Ptr(VALUE rval) {
+   !cxx_class_name!* ptr;
+   Data_Get_Struct(rval, !cxx_class_name!, ptr);
+
+   if ( ptr ) return dynamic_cast< !cxx_class_name!* >(ptr);
+
+   T!class_ptrmap!::iterator it = !class_ptrmap!.find(rval);
+
+   if ( it == !class_ptrmap!.end() ) {
+      rb_raise(rb_eRuntimeError, "Unable to find !cxx_class_name! instance for value %x (type %d)\\n", rval, TYPE(rval));
+      return NULL;
+   }
+
+   return dynamic_cast< !cxx_class_name!* >((*it).second);
+}
+
+VALUE cxx2ruby(!cxx_class_name!* instance) {
+  if ( instance == NULL ) return Qnil;
+
+  T!class_ptrmap!::iterator it, eend = !class_ptrmap!.end();
+
+  for(it = !class_ptrmap!.begin(); it != eend; it++)
+     if ( (*it).second == (!cxx_class_name!*)instance ) break;
+
+   if ( it != !class_ptrmap!.end() )
+      return (*it).first;
+   else {
+      VALUE klass = c!class_varname!;
+
+!test_children!
+
+      VALUE rval = Data_Wrap_Struct(klass, 0, 0, (void*)instance);
+      !class_ptrmap![rval] = instance;
+      // fprintf(stderr, "Wrapping instance %p in value %x (type %d)\\n", instance, rval, TYPE(rval));
+      return rval;
+   }
+}
+
+static VALUE !class_varname!_alloc(VALUE self) {
+   return Data_Wrap_Struct(self, 0, !class_free_function!, 0);
+}
+@
+
 end
