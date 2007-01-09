@@ -57,10 +57,9 @@ module Rust
       else
         ret = "#{varname} = rb_define_module_under(m#{@name.split("::")[0..-2].join("_")}, \"#{@name.split("::").last}\");\n"
       end
-      
-      #    @classes.each { |cls|
-      #      ret << cls.init
-      #    }
+
+      ret << @cxxclasses.collect { |klass| klass.initialization }.join("\n")
+      ret << @cwrappers.collect { |klass| klass.initialization }.join("\n")
       
       ret
     end
