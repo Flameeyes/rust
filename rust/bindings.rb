@@ -28,6 +28,8 @@ module Rust
     C = "c"     # :nodoc:
     CXX = "cxx" # :nodoc:
 
+    attr_reader :extension_unit, :extension_header
+
     def initialize(name) # :notnew:
       @name = name
 
