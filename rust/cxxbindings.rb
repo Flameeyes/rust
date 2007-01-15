@@ -35,8 +35,10 @@ module Rust
     def include_header(name, scope = Bindings::Global)
       name = 
         case scope
-          when HeaderLocal then "\"#{name}\""
-          when HeaderGlobal then "<#{name}>"
+        when HeaderLocal then "\"#{name}\""
+        when HeaderGlobal then "<#{name}>"
+        else
+          raise ArgumentError, "#{scope} not a valid value for scope parameter."
         end
 
       @cxx_includes << "\n#include #{name}"
