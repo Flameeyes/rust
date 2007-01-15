@@ -24,7 +24,19 @@ module Rust
   class CxxClass
     attr_reader :varname, :ptrmap, :function_free, :parentvar
 
-    def initialize(name, namespace, parent = nil)
+    # This function initializes the CxxClass instance by setting the
+    # values to the attributes defining its parent, namespace, name
+    # and a few other needed information.
+    #
+    # When a C++ Class is bound that is a child of another class, it
+    # shares its highest anchestor's pointer map (as that is the
+    # more general pointer type it can be referred to with), and
+    # function to call when free()'ing.
+    #
+    # Don't call this function directly, use Namespace.add_cxx_class
+    #
+    # *FIXME*: multiple inheritance can make Rust bail out, badly.
+    def initialize(name, namespace, parent = nil) # :notnew:
       @name = name
       @ns = namespace
       @parent = parent
