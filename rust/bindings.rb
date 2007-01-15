@@ -87,6 +87,8 @@ module Rust
     # Returns the content of the header for the bindings, recursively
     # calling the proper functions to get the declarations for the
     # modules bound and so on.
+    #
+    # This should *never* be used directly
     def header
       BindingsHeader.
         gsub("!bindings_name!", @name).
@@ -98,6 +100,8 @@ module Rust
     # Returns the content of the unit for the bindings, recursively
     # calling the proper functions to get the definitions and the
     # initialisation function for the modules bound and so on.
+    #
+    # This should *never* be used directly
     def unit
       BindingsUnit.
         gsub("!bindings_name!", @name).
