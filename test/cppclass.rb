@@ -23,7 +23,7 @@
 require 'rust'
 
 Rust::Bindings::create_bindings(Rust::Bindings::CXX, "cppclass_rb") do |b|
-  b.include_header '"cppclass.hh"'
+  b.include_header 'cppclass.hh', Rust::Bindings::HeaderLocal
 
   b.add_namespace "RustTest", "" do |ns|
     ns.add_cxx_class"TestClass" do |klass|

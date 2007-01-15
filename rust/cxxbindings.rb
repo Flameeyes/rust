@@ -24,8 +24,20 @@ require 'rust/namespace'
 
 module Rust
   class CxxBindings < Bindings
-    def include_header(name)
-      name = "<#{name}>" unless name =~ /^".*"$/
+    # Adds an include header with the specified name.
+    # This function adds to the list of header files to include the
+    # one with the specified name.
+    #
+    # If the scope paramether is set to Bindings.HeaderLocal, the name of
+    # the header file will be enclosed in double quotes ("") while
+    # including it, while it will be included it in angle quotes if
+    # the parameter is set to Bindings.HeaderGlobal (the default).
+    def include_header(name, scope = Bindings::Global)
+      name = 
+        case scope
+          when HeaderLocal then "\"#{name}\""
+          when HeaderGlobal then "<#{name}>"
+        end
 
       @cxx_includes << "\n#include #{name}"
     end

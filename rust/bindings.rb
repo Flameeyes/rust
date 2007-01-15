@@ -28,6 +28,14 @@ module Rust
     C = "c"     # :nodoc:
     CXX = "cxx" # :nodoc:
 
+    # Constant to use with include_header method to state that the
+    # included header is a system library header.
+    HeaderGlobal = "global"
+
+    # Constant to use with include_header method to state that the
+    # included header is a local header.
+    HeaderLocal = "local"
+
     def initialize(name) # :notnew:
       @name = name
 
