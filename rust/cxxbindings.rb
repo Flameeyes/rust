@@ -26,7 +26,10 @@ module Rust
   class CxxBindings < Bindings
     attr_reader :extension_unit, :extension_header
 
-    def initialize(name)
+    # Creates the bindings for a C++ library; this function only sets
+    # the proper values for extension_unit and extension_header, then
+    # calls Bindings.initialize
+    def initialize(name) # :notnew:
       @extension_unit = "cc"
       @extension_header = "hh"
 
