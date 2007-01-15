@@ -24,11 +24,13 @@ require 'rust/namespace'
 
 module Rust
   class CxxBindings < Bindings
-    def extension_unit
-      "cc"
-    end
-    def extension_header
-      "hh"
+    attr_reader :extension_unit, :extension_header
+
+    def initialize(name)
+      @extension_unit = "cc"
+      @extension_header = "hh"
+
+      super(name)
     end
 
     def include_header(name)
