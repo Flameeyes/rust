@@ -25,11 +25,12 @@ require "rust/cxxclass"
 module Rust
 
   class Namespace
-    attr_reader :name, :cxxname
+    attr_reader :name, :cxxname, :varname
 
     def initialize(name, cxxname)
       @name = name
       @cxxname = cxxname
+      @varname = "m#{@name.gsub("::", "_")}"
 
       @cxxclasses = Array.new
       @cwrappers = Array.new
@@ -42,10 +43,6 @@ module Rust
 
       @cxxclasses << klass
       return klass
-    end
-
-    def varname
-      "m#{@name.gsub("::", "_")}"
     end
 
     def declaration
