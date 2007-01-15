@@ -83,7 +83,7 @@ module Rust
     # binding C libraries, as they don't use namespace, so you have to
     # create the modules from scratch.
     def add_module(name)
-      add_namespace(name, nil)
+      add_namespace(name, "")
     end
 
     # Returns the content of the header for the bindings, recursively
