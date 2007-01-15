@@ -24,16 +24,6 @@ require 'rust/namespace'
 
 module Rust
   class CxxBindings < Bindings
-    # Creates the bindings for a C++ library; this function only sets
-    # the proper values for extension_unit and extension_header, then
-    # calls Bindings.initialize
-    def initialize(name) # :notnew:
-      @extension_unit = "cc"
-      @extension_header = "hh"
-
-      super(name)
-    end
-
     def include_header(name)
       name = "<#{name}>" unless name =~ /^".*"$/
 

@@ -28,8 +28,6 @@ module Rust
     C = "c"     # :nodoc:
     CXX = "cxx" # :nodoc:
 
-    attr_reader :extension_unit, :extension_header
-
     def initialize(name) # :notnew:
       @name = name
 
@@ -57,8 +55,8 @@ module Rust
 
       yield bindings
 
-      header = File.new("#{name}.#{bindings.extension_header}", "w")
-      unit = File.new("#{name}.#{bindings.extension_unit}", "w")
+      header = File.new("#{name}.hh", "w")
+      unit = File.new("#{name}.cc", "w")
       
       header.puts bindings.header
       unit.puts bindings.unit
