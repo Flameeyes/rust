@@ -22,3 +22,25 @@
 
 require 'rust/templates'
 require 'rust/bindings'
+
+# Rust is a Ruby bindings generator, developed by Diego Pettenò
+# <flameeyes@gmail.com>, based on a simpler Ruby bindings generator
+# that was used for RubyTag++ and ruby-hunspell.
+#
+# The original bindings generator was designed to permit a 1:1 mapping
+# between C++ classes and Ruby classes, as otherwise writing Ruby
+# bindings for a C++-based library would have consisted of a long
+# series of generic functions to convert the types from one language
+# to the other and to call the methods.
+#
+# Most C bindings, instead, either writes a lot of C code to create
+# "fake" Classes out of a vaguely object-oriented C API, or simply
+# create a module where to put all the C functions to call.
+#
+# The objective of Rust is to allow the description of a C or C++
+# interface, through the creation of 1:1 class mappings or the design
+# of "fake" classes out of C functions, without the need to actually
+# write all the generic code, as that does not really change beside
+# names, types and parameters.
+module Rust
+end
