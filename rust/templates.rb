@@ -21,6 +21,14 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 module Rust
+
+  # General template for the header file (.hh) of the bindings.
+  # This is the base that's recursively expanded to create the actual
+  # header file.
+  #
+  # Please note that the ruby header and the C header files coming
+  # from the bound library are included with C linkage rules, while
+  # the rest of the header follows C++ linkage rules.
   BindingsHeader  = 
 %@
 extern "C" {
@@ -37,6 +45,15 @@ extern "C" {
 
 @
 
+  # General template for the unit file (.cc) of the bindings.
+  # This is the base that's recursively expanded to create the actual
+  # header file.
+  #
+  # Please note that the visibility is set to the Init function only
+  # if the build processo found it, so that all the other functions
+  # and types are actually considered hidden, and thus not exported by
+  # the extension. Unfortunately GCC's libstdc++ does not correctly
+  # hide all of its symbols yet.
   BindingsUnit =
 %@
 
