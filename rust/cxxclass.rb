@@ -22,29 +22,26 @@
 
 module Rust
   class CxxClass
+    attr_reader :varname, :ptrmap, :function_free, :parentvar
+
     def initialize(name, namespace, parent = nil)
       @name = name
       @ns = namespace
       @parent = parent
 
       @children = Array.new
+
+      @varname = "#{@ns.name.gsub("::", "_")}_#{@name}"
+      if @parent
+        @ptrmap = @parent.ptrmap
+        @function_free = @parent.function_free
+        @parentvar = "c#{@parent.varname}"
+      else
+        @ptrmap = "#{@ns.name.gsub("::", "_")}_#{@name}_ptrMap"
+        @function_free = "#{varname}_free"
+        @parentvar = "rb_cObject"
+      end
     end
-
-   def varname
-      "#{@ns.name.gsub("::", "_")}_#{@name}"
-   end
-
-   def ptrmap
-     @parent ? @parent.ptrmap : "#{@ns.name.gsub("::", "_")}_#{@name}_ptrMap"
-   end
-
-   def function_free
-      @parent ? @parent.function_free : "#{varname}_free"
-   end
-
-   def parentvar
-      @parent ? "c#{@parent.varname}" : "rb_cObject"
-   end
 
    def test_children
       return unless @children
