@@ -26,7 +26,6 @@ require 'pathname'
 
 class CppClassTest < Test::Unit::TestCase
   def setup
-
     Rust::Bindings::create_bindings Rust::Bindings::LangCxx, "cppclass_rb" do |b|
       b.include_header 'cppclass.hh', Rust::Bindings::HeaderLocal
 
