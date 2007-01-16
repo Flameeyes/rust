@@ -21,12 +21,24 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 require 'rust'
+require 'test/unit'
+require 'pathname'
 
-Rust::Bindings::create_bindings Rust::Bindings::LangCxx, "cppclass_rb" do |b|
-  b.include_header 'cppclass.hh', Rust::Bindings::HeaderLocal
+class CppClassTest < Test::Unit::TestCase
+  def setup
 
-  b.add_namespace "RustTest", "" do |ns|
-    ns.add_cxx_class"TestClass" do |klass|
+    Rust::Bindings::create_bindings Rust::Bindings::LangCxx, "cppclass_rb" do |b|
+      b.include_header 'cppclass.hh', Rust::Bindings::HeaderLocal
+
+      b.add_namespace "RustTest", "" do |ns|
+        ns.add_cxx_class"TestClass" do |klass|
+        end
+      end
     end
+  end
+
+  def test_presence
+    assert Pathname.new("cppclass_rb.cc").exist?, "The bindings unit wasn't created"
+    assert Pathname.new("cppclass_rb.hh").exist?, "The bindings header wasn't created"
   end
 end
