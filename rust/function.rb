@@ -20,11 +20,36 @@
 # CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+require 'set'
+
 module Rust
   # This class represent an abstracted bound function; it is not
   # supposed to be used directly, instead its subclass should be used,
   # like CxxClass::Method.
   class Function
+    # Class representing a function or method parameter
+    class Parameter
+
+      attr_reader :type, :name, :optiona, :default
+
+      def initialize(type, name, optional, default) #:notnew:
+        @type = type
+        @name = name
+        @optional = optional
+        @default = default
+      end
+
+      # Returns the string of the parameter conversion from ruby to
+      # C++.
+      #
+      # The index parameter 
+      def conversion(index = nil)
+        paramname = index ? "argv[#{index}]" : @name
+
+        "ruby2#{@type.sub("*", "Ptr").gsub("::", "_")}(#{paramname}),"
+      end
+    end
+
     attr_reader :varname
 
     # Initialisation function, sets the important parameters from the
@@ -35,6 +60,28 @@ module Rust
       @bindname = params[:bindname]
 
       @varname = "f#{@name}"
+
+      @aliases = Set.new
+      @parameters = Array.new
+      @variable = false # Variable arguments function
+    end
+
+    # Adds an alias for the function.
+    # The same C++ function can be bound with more than one name,
+    # as CamelCase names in the methods are bound also  with
+    # ruby_style names, so that the users can choose what to use.
+    def add_alias(name)
+      @aliases << name
+    end
+
+    # Adds a new parameter to the function
+    def add_parameter(name, type, optional = false, default = nil)
+      param = Parameter.new(name, type, optional, default)
+      @parameters << param
+
+      @variable = true if optional or default != nil
+
+      return param
     end
   end
 end
