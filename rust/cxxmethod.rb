@@ -33,10 +33,20 @@ module Rust
       # Initialisation function, calls Function.initialize and sets
       # the important parameters that differs from a generic function
       def initialize(params) # :notnew:
+        params[:parent] = params[:klass]
         super
 
-        @klass = params[:klass]
-        @varname = "f#{@klass.namespace.name.gsub("::","_")}_#{@klass.name}_#{@name}"
+        @varname = "f#{@parent.namespace.name.gsub("::","_")}_#{@parent.name}_#{@name}"
+      end
+
+      def raw_call(param = nil)
+        "tmp->#{super(param)}"
+      end
+
+      def definition
+        CxxMethodStub.
+          gsub("!method_prototype!", prototype).
+          gsub("!method_call!", stub)
       end
     end
   end

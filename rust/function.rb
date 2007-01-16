@@ -58,12 +58,19 @@ module Rust
       @return = params[:return]
       @name = params[:name]
       @bindname = params[:bindname]
+      @parent = params[:parent]
 
       @varname = "f#{@name}"
 
       @aliases = Set.new
       @parameters = Array.new
       @variable = false # Variable arguments function
+
+      nocamel_bindname = @bindname.gsub(/([^A-Z])([A-Z])([^A-Z])/) do
+        |letter| "#{$1}_#{$2.downcase}#{$3}"
+      end
+      
+      @aliases << nocamel_bindname unless nocamel_bindname == @bindname
     end
 
     # Adds an alias for the function.
@@ -72,6 +79,12 @@ module Rust
     # ruby_style names, so that the users can choose what to use.
     def add_alias(name)
       @aliases << name
+      
+      nocamel_alias = name.gsub(/([^A-Z])([A-Z])([^A-Z])/) do
+        |letter| "#{$1}_#{$2.downcase}#{$3}"
+      end
+      
+      @aliases << nocamel_alias unless nocamel_alias == name
     end
 
     # Adds a new parameter to the function
@@ -83,5 +96,90 @@ module Rust
 
       return param
     end
+
+    def params_conversion(nparms = nil, params = nil)
+      return if @parameters.empty?
+      vararg = nparms != nil
+      nparms = @parameters.size unless nparms
+      
+      ret = ""
+      @parameters.slice(0, nparms).each_index { |p|
+        ret << @parameters[p].conversion( vararg ? p : nil )
+      }
+      ret << "#{params[0]}," if params
+      
+      ret.chomp!(",")
+    end
+    
+    def prototype
+      case
+        # when @template
+        #   @template[:prototype].gsub('!varname!', varname)
+        # when @custom
+        #   @custom_prototype
+      when @variable
+        "VALUE #{varname} ( int argc, VALUE *argv, VALUE self )"
+      else
+        "VALUE #{varname} ( VALUE self " +
+          @parameters.collect { |p| ", VALUE #{p.name}" }.join +
+          " )"
+      end
+    end
+    
+    def raw_call(param = nil, params = nil)
+      "#{@name}(#{params_conversion(param)})"
+    end
+    private :raw_call
+    
+    def bind_call(param = nil, params = nil)
+      case @return
+      when "void", nil
+        return "#{raw_call(param)}; return Qnil;\n"
+      else
+        return "return cxx2ruby((#{@return})#{raw_call(param)});\n"
+      end
+    end
+    private :bind_call
+
+    def stub
+      return bind_call unless @variable
+      calls = ""
+
+      for n in 0..(@parameters.size-1)
+        calls << "  case #{n}: #{bind_call(n)}" if @parameters[n].optional
+        calls << "  case #{n}: #{bind_call(n, [@parameters[n].default])}" if
+          @parameters[n].default
+      end
+
+      calls << "  case #{@parameters.size}: #{bind_call(@parameters.size)}"
+
+      return VariableFunctionCall.gsub("!calls!", calls)
+    end
+
+    def initialization
+      paramcount = 
+        case
+          # when @custom then @custom_paramcount
+          # when @template then @template_paramcount
+        when @variable then -1
+        else @parameters.size
+        end
+
+      ret = FunctionInitBinding.
+        gsub("!parent_varname!", @parent.varname).
+        gsub("!function_bindname!", @bindname).
+        gsub("!function_varname!", @varname).
+        gsub("!function_paramcount!", paramcount.to_s)
+
+      @aliases.each do |alii|
+        ret << FunctionInitAlias.
+          gsub("!parent_varname!", @parent.varname).
+          gsub("!function_alias!", alii).
+          gsub("!function_bindname!", @bindname)
+      end
+
+      return ret
+    end
+
   end
 end

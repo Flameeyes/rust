@@ -25,7 +25,7 @@ require 'rust/cxxmethod'
 module Rust
   class CxxClass
     attr_reader :name
-    attr_reader :varname, :ptrmap, :function_free, :parentvar
+    attr_reader :varname, :ptrmap, :function_free, :parent_varname
 
     # Rust::Namespace object for the class, used to get the proper C++
     # name.
@@ -55,11 +55,11 @@ module Rust
       if @parent
         @ptrmap = @parent.ptrmap
         @function_free = @parent.function_free
-        @parentvar = "c#{@parent.varname}"
+        @parent_varname = "c#{@parent.varname}"
       else
         @ptrmap = "#{@namespace.name.gsub("::", "_")}_#{@name}_ptrMap"
         @function_free = "#{varname}_free"
-        @parentvar = "rb_cObject"
+        @parent_varname = "rb_cObject"
       end
     end
 
@@ -80,6 +80,20 @@ module Rust
       return constructor
     end
 
+    def add_method(name, return_value = "void", bindname = name)
+      method = Method.new({ :name => name,
+                            :bindname => bindname,
+                            :return => return_value,
+                            :klass => self
+                          })
+
+      yield method
+
+      @methods << method
+
+      return method
+    end
+
     # This function is used during ruby to C/C++ conversion of the
     # types, and test for the deepest class the pointer is valid for.
     def test_children
@@ -97,26 +111,51 @@ module Rust
      @
       end
 
-      ret
+      return ret
     end
 
-
     def declaration
-      (CxxClassDeclarations + (@parent ? "" : CxxStandaloneClassDeclarations )).
+      ret = (CxxClassDeclarations + (@parent ? "" : CxxStandaloneClassDeclarations )).
         gsub("!class_varname!", varname).
         gsub("!cxx_class_name!", "#{@namespace.cxxname}::#{@name}").
         gsub("!class_ptrmap!", ptrmap)
+
+      @methods.each do |method|
+        ret << "#{method.prototype};"
+      end
+
+      return ret
     end
     
     def definition
-      (CxxClassDefinitions + (@parent ? "" : CxxStandaloneClassDefinitions )).
+      ret = (CxxClassDefinitions + (@parent ? "" : CxxStandaloneClassDefinitions )).
         gsub("!class_varname!", varname).
         gsub("!cxx_class_name!", "#{@namespace.cxxname}::#{@name}").
         gsub("!class_ptrmap!", ptrmap).
-        gsub("!test_children!", test_children)
+        gsub("!test_children!", test_children).
+        gsub("!class_free_function!", @function_free)
+
+      @methods.each do |method|
+        ret << method.definition.
+          gsub("!class_varname!", varname).
+          gsub("!cxx_class_name!", "#{@namespace.cxxname}::#{@name}")
+      end
+
+      return ret
     end
     
     def initialization
+      ret = CxxClassInitialize.
+        gsub("!class_varname!", varname).
+        gsub("!cxx_class_basename!", @name.split("::").last).
+        gsub("!parent_varname!", @parent_varname).
+        gsub("!namespace_varname!", @namespace.varname)
+
+      @methods.each do |method|
+        ret << method.initialization
+      end
+
+      return ret
     end
   end
 end

@@ -32,8 +32,12 @@ class CppClassBase < Test::Unit::TestCase
       b.include_header 'cppclass.hh', Rust::Bindings::HeaderLocal
 
       b.add_namespace "RustTest", "" do |ns|
-        ns.add_cxx_class"TestClass" do |klass|
+        ns.add_cxx_class "TestClass" do |klass|
           klass.add_constructor do |method|
+          end
+
+          klass.add_method "action1" do |method|
+            method.add_parameter "uint32_t", "val"
           end
         end
       end

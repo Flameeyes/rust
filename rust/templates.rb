@@ -165,4 +165,53 @@ static void !class_varname!_free(void *p) {
 }
 @
 
+  # Template for the initialization calls for a C++ class 
+  CxxClassInitialize =
+%@
+  c!class_varname! = rb_define_class_under(!namespace_varname!,
+    "!cxx_class_basename!", !parent_varname!);
+  rb_define_alloc_func(c!class_varname!, !class_varname!_alloc);
+@
+  
+  # Template for a variable arguments function call
+  VariableFunctionCall =
+%@
+  switch(argc) {
+!calls!
+  default:
+    rb_raise(rb_eArgError, "Mantatory parameters missing");
+    return Qnil;
+  }
+@
+
+  # Template for the init function snippet registering a function (or
+  # a method).
+  # Note that in the case of a method, !parent_varname! would be a
+  # synonim for !class_varname!.
+  FunctionInitBinding = 
+%@
+  rb_define_method(!parent_varname!, "!function_bindname!",
+    RUBY_METHOD_FUNC(!function_varname!), !function_paramcount!);
+@
+
+  # Template for the init function snipped registering an alias for a
+  # function or a method.
+  FunctionInitAlias =
+%@
+  rb_define_alias(!parent_varname!, "!function_alias!", "!function_bindname!");
+@
+
+  # Template of a C++ Method stub, the function used to convert the
+  # parameters from Ruby objects to C++, and then call the real C++ function.
+  CxxMethodStub = 
+%@
+!method_prototype! {
+  !cxx_class_name!* tmp = ruby2!class_varname!Ptr(self);
+  if ( ! tmp ) return Qnil;
+    // The exception is thrown already by ruby2*
+
+  !method_call!
+}
+@
+
 end
