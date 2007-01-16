@@ -20,6 +20,8 @@
 # CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+require 'rust/cxxmethod'
+
 module Rust
   class CxxClass
     attr_reader :varname, :ptrmap, :function_free, :parentvar
@@ -42,6 +44,7 @@ module Rust
       @parent = parent
 
       @children = Array.new
+      @methods = Array.new
 
       @varname = "#{@ns.name.gsub("::", "_")}_#{@name}"
       if @parent
@@ -53,6 +56,23 @@ module Rust
         @function_free = "#{varname}_free"
         @parentvar = "rb_cObject"
       end
+    end
+
+    # Adds a new constructor for the class.
+    # This function creates a new constructor method for the C++
+    # class to bind, and yields it so that parameters can be added
+    # afterward.
+    def add_constructor
+      constructor = Method.new({ :return => nil,
+                                 :name => @name,
+                                 :bindname => "initialize",
+                                 :klass => self
+                               })
+      yield constructor
+
+      @methods << constructor
+
+      return constructor
     end
 
     # This function is used during ruby to C/C++ conversion of the
