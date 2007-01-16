@@ -55,23 +55,25 @@ module Rust
       end
     end
 
-   def test_children
+    # This function is used during ruby to C/C++ conversion of the
+    # types, and test for the deepest class the pointer is valid for.
+    def test_children
       return unless @children
-
+      
       ret = ""
-
-      @children.each { |klass|
-         ret << %@
-if ( dynamic_cast< #{klass.ns.cxxname}::#{klass.name}* >(instance) != NULL )
-{
-   klass = c#{klass.varname};
-   #{klass.test_children}
-}
-@
-      }
+      
+      @children.each do |klass|
+        ret << %@
+     if ( dynamic_cast< #{klass.ns.cxxname}::#{klass.name}* >(instance) != NULL )
+     {
+       klass = c#{klass.varname};
+       #{klass.test_children}
+     }
+     @
+      end
 
       ret
-   end
+    end
 
 
     def declaration
