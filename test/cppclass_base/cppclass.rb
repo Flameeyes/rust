@@ -33,6 +33,8 @@ class CppClassBase < Test::Unit::TestCase
 
       b.add_namespace "RustTest", "" do |ns|
         ns.add_cxx_class"TestClass" do |klass|
+          klass.add_constructor do |method|
+          end
         end
       end
     end
