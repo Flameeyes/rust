@@ -24,7 +24,12 @@ require 'rust/cxxmethod'
 
 module Rust
   class CxxClass
+    attr_reader :name
     attr_reader :varname, :ptrmap, :function_free, :parentvar
+
+    # Rust::Namespace object for the class, used to get the proper C++
+    # name.
+    attr_reader :namespace
 
     # This function initializes the CxxClass instance by setting the
     # values to the attributes defining its parent, namespace, name
@@ -40,19 +45,19 @@ module Rust
     # *FIXME*: multiple inheritance can make Rust bail out, badly.
     def initialize(name, namespace, parent = nil) # :notnew:
       @name = name
-      @ns = namespace
+      @namespace = namespace
       @parent = parent
 
       @children = Array.new
       @methods = Array.new
 
-      @varname = "#{@ns.name.gsub("::", "_")}_#{@name}"
+      @varname = "#{@namespace.name.gsub("::", "_")}_#{@name}"
       if @parent
         @ptrmap = @parent.ptrmap
         @function_free = @parent.function_free
         @parentvar = "c#{@parent.varname}"
       else
-        @ptrmap = "#{@ns.name.gsub("::", "_")}_#{@name}_ptrMap"
+        @ptrmap = "#{@namespace.name.gsub("::", "_")}_#{@name}_ptrMap"
         @function_free = "#{varname}_free"
         @parentvar = "rb_cObject"
       end
@@ -84,7 +89,7 @@ module Rust
       
       @children.each do |klass|
         ret << %@
-     if ( dynamic_cast< #{klass.ns.cxxname}::#{klass.name}* >(instance) != NULL )
+     if ( dynamic_cast< #{klass.namespace.cxxname}::#{klass.name}* >(instance) != NULL )
      {
        klass = c#{klass.varname};
        #{klass.test_children}
@@ -99,14 +104,14 @@ module Rust
     def declaration
       (CxxClassDeclarations + (@parent ? "" : CxxStandaloneClassDeclarations )).
         gsub("!class_varname!", varname).
-        gsub("!cxx_class_name!", "#{@ns.cxxname}::#{@name}").
+        gsub("!cxx_class_name!", "#{@namespace.cxxname}::#{@name}").
         gsub("!class_ptrmap!", ptrmap)
     end
     
     def definition
       (CxxClassDefinitions + (@parent ? "" : CxxStandaloneClassDefinitions )).
         gsub("!class_varname!", varname).
-        gsub("!cxx_class_name!", "#{@ns.cxxname}::#{@name}").
+        gsub("!cxx_class_name!", "#{@namespace.cxxname}::#{@name}").
         gsub("!class_ptrmap!", ptrmap).
         gsub("!test_children!", test_children)
     end
