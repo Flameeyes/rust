@@ -36,7 +36,7 @@ module Rust
         super
 
         @klass = params[:klass]
-        @varname = "f#{@klass.namespace.name.gsub("::", "_")}_#{@klass.name}_#{@name}"
+        @varname = "f#{@klass.namespace.name.gsub("::","_")}_#{@klass.name}_#{@name}"
       end
     end
   end
