@@ -24,7 +24,9 @@ require 'rust'
 require 'test/unit'
 require 'pathname'
 
-class CppClassTest < Test::Unit::TestCase
+module Rust::Test
+
+class CppClassBase < Test::Unit::TestCase
   def setup
     Rust::Bindings::create_bindings Rust::Bindings::LangCxx, "cppclass_rb" do |b|
       b.include_header 'cppclass.hh', Rust::Bindings::HeaderLocal
@@ -40,4 +42,6 @@ class CppClassTest < Test::Unit::TestCase
     assert Pathname.new("cppclass_rb.cc").exist?, "The bindings unit wasn't created"
     assert Pathname.new("cppclass_rb.hh").exist?, "The bindings header wasn't created"
   end
+end
+
 end
