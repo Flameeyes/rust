@@ -1,4 +1,4 @@
-TESTDIRS=cppclass_base
+TESTDIRS=cppclass_base languages
 
 all: test
 
