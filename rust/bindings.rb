@@ -25,8 +25,13 @@ module Rust
   # You shouldn't instantiate this manually, but rather use the
   # create_bindings function.
   class Bindings
-    C = "c"     # :nodoc:
-    CXX = "cxx" # :nodoc:
+    # Constant to use with Bindings.create_bindings to state that the
+    # bindings that are to be created are for a C library.
+    LangC = "c"
+
+    # Constant to use with Bindings.create_bindings to state that the
+    # bindings that are to be created are for a C++ library.
+    LangCxx = "cxx"
 
     # Constant to use with include_header method to state that the
     # included header is a system library header.
@@ -44,21 +49,25 @@ module Rust
       @c_includes = ""
     end
 
-    # This function is called when creating a set of bindings for
-    # Ruby; the first parameter is one of Rust::Bindings::C or
-    # Rust::Bindings::CXX constants, and decides whether the bindings
-    # are for a C or C++ library. Although Rust still generates C++
-    # code for the extension, when binding a C++ library, the classes
-    # are mapped 1:1 from the C++ interface, while when binding a C
-    # library you need to create "false" classes that wraps around the
-    # C interface.
+    # This function is called when creating Ruby bindings for a
+    # library.
+    #
+    # The first parameter has to be one between Rust::Bindings::LangC
+    # or Rust::Bindings::LangCxx, and tells Rust which programming
+    # language the library to bind is written into.
+    #
+    # Please note that Rust always generates C++ code even when
+    # binding a library written in C, as STL templates are used all
+    # over the generics code.
     def Bindings.create_bindings(type, name)
       bindings = 
         case type
-        when Bindings::CXX
-          bindings = CxxBindings.new(name)
+        when Bindings::LangCxx
+          CxxBindings.new(name)
 #        when Bindings::C
 #          bindings = CBindings.new(name)
+        else
+          raise ArgumentError, "#{type} is not a valid value for type parameter"
         end
 
       yield bindings
