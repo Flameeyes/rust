@@ -24,12 +24,19 @@ require 'pathname'
 
 module Rust
 
-  Templates = { }
+  class Templates
+    @cache = { }
+    @tpls_dir = (Pathname File.dirname(__FILE__)) + "templates"
 
-  ( (Pathname File.dirname(__FILE__)) + "templates" ).each_entry do |file|
-    next unless file.extname == ".rusttpl"
-    Templates[file.basename(".rusttpl").to_s] = 
-      ((Pathname File.dirname(__FILE__)) + "templates" + file).read
+    def Templates.[](name)
+      return @cache[name] if @cache[name]
+
+      pn = @tpls_dir + "#{name}.rusttpl"
+      raise "Template #{name} not found." unless pn.exist?
+
+      @cache[name] = pn.read.gsub(/\/\/.*$\n?/, '')
+      return @cache[name]
+    end
   end
 
 end
