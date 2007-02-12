@@ -153,7 +153,7 @@ module Rust
 
       calls << "  case #{@parameters.size}: #{bind_call(@parameters.size)}"
 
-      return VariableFunctionCall.gsub("!calls!", calls)
+      return Templates["VariableFunctionCall"].gsub("!calls!", calls)
     end
 
     def initialization
@@ -165,14 +165,14 @@ module Rust
         else @parameters.size
         end
 
-      ret = FunctionInitBinding.
+      ret = Templates["FunctionInitBinding"].
         gsub("!parent_varname!", @parent.varname).
         gsub("!function_bindname!", @bindname).
         gsub("!function_varname!", @varname).
         gsub("!function_paramcount!", paramcount.to_s)
 
       @aliases.each do |alii|
-        ret << FunctionInitAlias.
+        ret << Templates["FunctionInitAlias"].
           gsub("!parent_varname!", @parent.varname).
           gsub("!function_alias!", alii).
           gsub("!function_bindname!", @bindname)

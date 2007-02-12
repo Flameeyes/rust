@@ -44,7 +44,7 @@ module Rust
       end
 
       def definition
-        CxxMethodStub.
+        Templates["CxxMethodStub"].
           gsub("!method_prototype!", prototype).
           gsub("!method_call!", stub)
       end

@@ -1,0 +1,6 @@
+//-*-c++-*-
+// Template for the initialization calls for a C++ class 
+
+  c!class_varname! = rb_define_class_under(!namespace_varname!,
+    "!cxx_class_basename!", !parent_varname!);
+  rb_define_alloc_func(c!class_varname!, !class_varname!_alloc);

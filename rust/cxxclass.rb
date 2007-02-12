@@ -115,7 +115,7 @@ module Rust
     end
 
     def declaration
-      ret = (CxxClassDeclarations + (@parent ? "" : CxxStandaloneClassDeclarations )).
+      ret = (Templates["CxxClassDeclarations"] + (@parent ? "" : Templates["CxxStandaloneClassDeclarations"] )).
         gsub("!class_varname!", varname).
         gsub("!cxx_class_name!", "#{@namespace.cxxname}::#{@name}").
         gsub("!class_ptrmap!", ptrmap)
@@ -128,7 +128,7 @@ module Rust
     end
     
     def definition
-      ret = (CxxClassDefinitions + (@parent ? "" : CxxStandaloneClassDefinitions )).
+      ret = (Templates["CxxClassDefinitions"] + (@parent ? "" : Templates["CxxStandaloneClassDefinitions"] )).
         gsub("!class_varname!", varname).
         gsub("!cxx_class_name!", "#{@namespace.cxxname}::#{@name}").
         gsub("!class_ptrmap!", ptrmap).
@@ -145,7 +145,7 @@ module Rust
     end
     
     def initialization
-      ret = CxxClassInitialize.
+      ret = Templates["CxxClassInitialize"].
         gsub("!class_varname!", varname).
         gsub("!cxx_class_basename!", @name.split("::").last).
         gsub("!parent_varname!", @parent_varname).

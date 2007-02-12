@@ -1,0 +1,5 @@
+//-*-c++-*-
+
+VALUE !module_name!;
+!cxx_classes_definitions!
+!c_class_wrappers_definitions!

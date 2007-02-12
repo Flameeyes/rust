@@ -46,14 +46,14 @@ module Rust
     end
 
     def declaration
-      ModuleDeclarations.
+      Templates["ModuleDeclarations"].
         gsub("!module_name!", @name).
         gsub("!cxx_classes_declarations!", @cxxclasses.collect { |klass| klass.declaration }.join("\n")).
         gsub("!c_class_wrappers_declarations!", @cwrappers.collect { |klass| klass.declaration }.join("\n"))
     end
     
     def definition
-      ModuleDefinitions.
+      Templates["ModuleDefinitions"].
         gsub("!module_name!", @name).
         gsub("!cxx_classes_definitions!", @cxxclasses.collect { |klass| klass.definition }.join("\n")).
         gsub("!c_class_wrappers_definitions!", @cwrappers.collect { |klass| klass.definition }.join("\n"))

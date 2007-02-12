@@ -1,0 +1,5 @@
+//-*-c++-*-
+
+extern VALUE !module_name!;
+!cxx_classes_declarations!
+!c_class_wrappers_declarations!

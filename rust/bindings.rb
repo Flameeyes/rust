@@ -107,7 +107,7 @@ module Rust
     #
     # This should *never* be used directly
     def header
-      BindingsHeader.
+      Templates["BindingsHeader"].
         gsub("!bindings_name!", @name).
         gsub("!modules_declaration!", @modules.collect { |ns| ns.declaration }.join("\n")).
         gsub("!cxx_includes!", @cxx_includes).
@@ -120,7 +120,7 @@ module Rust
     #
     # This should *never* be used directly
     def unit
-      BindingsUnit.
+      Templates["BindingsUnit"].
         gsub("!bindings_name!", @name).
         gsub("!modules_initialization!", @modules.collect { |ns| ns.initialization }.join("\n")).
         gsub("!modules_definition!", @modules.collect { |ns| ns.definition }.join("\n"))
