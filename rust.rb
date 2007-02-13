@@ -50,7 +50,7 @@ module Rust
   # just for documenting that particular template). 
   class Templates
     @cache = { }
-    @tpls_dir = (Pathname File.dirname(__FILE__)) + "templates"
+    @tpls_dir = (Pathname File.dirname(__FILE__)) + "rust/templates"
 
     def Templates.[](name)
       return @cache[name] if @cache[name]
