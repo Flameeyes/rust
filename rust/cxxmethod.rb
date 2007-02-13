@@ -42,8 +42,8 @@ module Rust
         @definition_template = Templates["CxxMethodStub"]
       end
 
-      def raw_call(param = nil)
-        "tmp->#{super(param)}"
+      def raw_call(param = nil, params = nil)
+        "tmp->#{super(param, params)}"
       end
     end
 
@@ -63,12 +63,12 @@ module Rust
         @definition_template = Templates["CxxConstructorStub"]
       end
 
-      def raw_call(param = nul)
-        "tmp = new #{super(param)}"
+      def raw_call(param = nil, params = nil)
+        "tmp = new #{super(param, params)}"
       end
 
       def bind_call(param = nil, params = nil)
-        "#{raw_call(param)};\n"
+        "#{raw_call(param, params)};\n"
       end
     end
   end

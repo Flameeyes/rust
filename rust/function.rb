@@ -140,7 +140,7 @@ module Rust
     end
     
     def raw_call(param = nil, params = nil)
-      "#{@name}(#{params_conversion(param)})"
+      "#{@name}(#{params_conversion(param, params)})"
     end
     private :raw_call
     
@@ -149,9 +149,9 @@ module Rust
       when nil
         raise "nil return value is not supported for non-constructors."
       when "void"
-        return "#{raw_call(param)}; return Qnil;\n"
+        return "#{raw_call(param, params)}; return Qnil;\n"
       else
-        return "return cxx2ruby((#{@return})#{raw_call(param)});\n"
+        return "return cxx2ruby((#{@return})#{raw_call(param, params)});\n"
       end
     end
     private :bind_call
