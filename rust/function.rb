@@ -129,6 +129,7 @@ module Rust
       @definition_template.
         gsub("!function_prototype!", prototype).
         gsub("!function_call!", stub).
+        gsub("!function_varname!", varname).
         gsub("!function_cname!", @name)
     end
 
