@@ -133,7 +133,9 @@ module Rust
     
     def bind_call(param = nil, params = nil)
       case @return
-      when "void", nil
+      when nil
+        return "#{raw_call(param)};\n"
+      when "void"
         return "#{raw_call(param)}; return Qnil;\n"
       else
         return "return cxx2ruby((#{@return})#{raw_call(param)});\n"
