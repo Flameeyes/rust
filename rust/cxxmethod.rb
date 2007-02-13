@@ -68,6 +68,10 @@ module Rust
         "tmp = new #{super(param)}"
       end
 
+      def bind_call(param = nil, params = nil)
+        "#{raw_call(param)};\n"
+      end
+
       def definition
         Templates["CxxConstructorStub"].
           gsub("!method_prototype!", prototype).

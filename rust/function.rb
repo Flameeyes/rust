@@ -134,7 +134,7 @@ module Rust
     def bind_call(param = nil, params = nil)
       case @return
       when nil
-        return "#{raw_call(param)};\n"
+        raise "nil return value is not supported for non-constructors."
       when "void"
         return "#{raw_call(param)}; return Qnil;\n"
       else
