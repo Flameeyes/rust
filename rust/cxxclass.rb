@@ -68,11 +68,7 @@ module Rust
     # class to bind, and yields it so that parameters can be added
     # afterward.
     def add_constructor
-      constructor = Method.new({ :return => nil,
-                                 :name => @name,
-                                 :bindname => "initialize",
-                                 :klass => self
-                               })
+      constructor = Constructor.new(self)
       yield constructor
 
       @methods << constructor
@@ -137,6 +133,7 @@ module Rust
 
       @methods.each do |method|
         ret << method.definition.
+          gsub("!class_ptrmap!", ptrmap).
           gsub("!class_varname!", varname).
           gsub("!cxx_class_name!", "#{@namespace.cxxname}::#{@name}")
       end

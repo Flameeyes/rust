@@ -49,5 +49,30 @@ module Rust
           gsub("!method_call!", stub)
       end
     end
+
+    # This class is used to represente the constructor of a C++ class
+    # bound in a Ruby extension.
+    class Constructor < Function
+      
+      # Initialisation function, calls Function.initialise, but accepts
+      # only a single parameter, the class the constructor belong to.
+      def initialize(klass) # :notnew:
+        super({
+                :parent => klass,
+                :bindname => "initialize",
+                :name => klass.name
+              })
+      end
+
+      def raw_call(param = nul)
+        "tmp = new #{super(param)}"
+      end
+
+      def definition
+        Templates["CxxConstructorStub"].
+          gsub("!method_prototype!", prototype).
+          gsub("!method_call!", stub)
+      end
+    end
   end
 end
