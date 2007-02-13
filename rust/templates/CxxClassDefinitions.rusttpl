@@ -1,6 +1,6 @@
 //-*-c++-*-
 
-VALUE c!class_varname!;
+VALUE r!class_varname!;
 
 !cxx_class_name!* ruby2!class_varname!Ptr(VALUE rval) {
    !cxx_class_name!* ptr;
@@ -29,7 +29,7 @@ VALUE cxx2ruby(!cxx_class_name!* instance) {
    if ( it != !class_ptrmap!.end() )
       return (*it).first;
    else {
-      VALUE klass = c!class_varname!;
+      VALUE klass = r!class_varname!;
 
 !test_children!
 

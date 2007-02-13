@@ -1,5 +1,5 @@
 //-*-c++-*-
 
-extern VALUE c!class_varname!;
+extern VALUE r!class_varname!;
 VALUE cxx2ruby(!cxx_class_name!* instance);
 !cxx_class_name!* ruby2!class_varname!Ptr(VALUE rval);
