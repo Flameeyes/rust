@@ -43,8 +43,10 @@ class Extension < Test::Unit::TestCase
   end
 
   def test_03camel
-    assert @instance.integer_value == 1234, "Camel case to ruby conversion does not work"
-    assert @instance.string_value == "a test", "Camel case to ruby conversion does not work"
+    assert RustTest::TestClass.instance_methods.include?("integer_value"),
+      "The converted CamelCase to ruby_convention is missing."
+    assert RustTest::TestClass.instance_method("integer_value") == RustTest::TestClass.instance_method("integerValue"),
+      "The converted CamelCase to ruby_conversion is not an alias of the original method"
   end
 end
 
