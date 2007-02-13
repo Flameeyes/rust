@@ -1,13 +1,9 @@
 TESTUNIT=cppclass.rb
 SOURCES=cppclass.cc cppclass.hh
-GENERATED=cppclass_rb.cc cppclass_rb.hh
 RUST_SOURCES=$(wildcard ../../rust/*.rb ../../rust/templates/*.rusttpl)
 RUBY_INCLUDEDIR=`ruby -e 'require "rbconfig"; print Config::CONFIG["archdir"];'`
 
-test: cppclass_base_generation
-
-cppclass_base_generation: $(GENERATED)
-
+test: cppclass.so
 
 cppclass_rb.hh: cppclass_rb.cc
 cppclass_rb.cc: $(SOURCES) $(TESTUNIT) $(RUST_SOURCES)
