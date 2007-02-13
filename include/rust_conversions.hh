@@ -27,6 +27,10 @@
 #include <stdint.h>
 #include <ruby.h>
 
+#include <string>
+
+/* Standard conversions for integer values */
+
 static inline uint32_t ruby2uint(VALUE rval) {
   return NUM2UINT(rval);
 }
@@ -55,5 +59,21 @@ static inline VALUE cxx2ruby(uint32_t val) {
 #define ruby2int32_t  ruby2int
 #define ruby2int16_t  ruby2int
 #define ruby2int8_t   ruby2int
+
+/* Conversion for common types (like strings */
+
+static inline char *ruby2charPtr(VALUE rval) {
+  Check_Type(rval, T_STRING);
+  return StringValuePtr(rval);
+}
+
+static inline VALUE cxx2ruby(const char *val) {
+  if ( ! val ) return Qnil;
+  return rb_str_new2(val);
+}
+
+static inline VALUE cxx2ruby(const std::string &str) {
+  return rb_str_new2(str.c_str());
+}
 
 #endif
