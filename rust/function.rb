@@ -110,6 +110,7 @@ module Rust
       
       ret.chomp!(",")
     end
+    private :params_conversion
     
     def prototype
       case
@@ -157,7 +158,7 @@ module Rust
 
       return Templates["VariableFunctionCall"].gsub("!calls!", calls)
     end
-
+    
     def initialization
       paramcount = 
         case
