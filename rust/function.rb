@@ -128,7 +128,8 @@ module Rust
     def definition
       @definition_template.
         gsub("!function_prototype!", prototype).
-        gsub("!function_call!", stub)
+        gsub("!function_call!", stub).
+        gsub("!function_cname!", @name)
     end
 
     def prototype
