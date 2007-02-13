@@ -69,7 +69,13 @@ module Rust
     # afterward.
     def add_constructor
       constructor = Constructor.new(self)
-      yield constructor
+
+      begin
+        yield constructor
+      rescue LocalJumpError
+        # Ignore this, we can easily have methods without parameters
+        # or other extra informations.
+      end
 
       @methods << constructor
 
