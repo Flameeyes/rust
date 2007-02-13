@@ -13,4 +13,4 @@ cppclass_rb.cc: $(SOURCES) $(TESTUNIT) $(RUST_SOURCES)
 	ruby -I ../.. -I ../../rust $(TESTUNIT)
 
 clean:
-	-rm $(GENERATED)
+	-rm -f $(GENERATED)

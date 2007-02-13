@@ -9,5 +9,5 @@ test:
 
 clean:
 	-for subdir in $(TESTDIRS); do \
-		make -C $$subdir clean || exit 0; \
+		make -k -C $$subdir clean || exit 0; \
 	done
