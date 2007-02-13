@@ -28,25 +28,23 @@ module Rust::Test
 class Extension < Test::Unit::TestCase
   def setup
     require 'cppclass_rb'
-  end
 
-  def test_01constructor
     @instance = RustTest::TestClass.new
   end
 
-  def test_02integers
-    foo.action1 1234
-    assert foo.integerValue == 1234, "The integer value does not correspond"
+  def test_01integers
+    @instance.action1 1234
+    assert @instance.integerValue == 1234, "The integer value does not correspond"
   end
 
-  def test_03strings
-    foo.action2 "a test"
-    assert foo.stringValue == "a test", "The string value does not correspond"
+  def test_02strings
+    @instance.action2 "a test"
+    assert @instance.stringValue == "a test", "The string value does not correspond"
   end
 
-  def test_04camel
-    assert foo.integer_value == 1234, "Camel case to ruby conversion does not work"
-    assert foo.string_value == "a test", "Camel case to ruby conversion does not work"
+  def test_03camel
+    assert @instance.integer_value == 1234, "Camel case to ruby conversion does not work"
+    assert @instance.string_value == "a test", "Camel case to ruby conversion does not work"
   end
 end
 
