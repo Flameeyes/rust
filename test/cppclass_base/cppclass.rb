@@ -40,7 +40,14 @@ class CppClassBase < Test::Unit::TestCase
             method.add_parameter "uint32_t", "val"
           end
 
+          klass.add_method "action2" do |method|
+            method.add_parameter "char *", "string"
+          end
+
           klass.add_method "integerValue", "uint32_t" do |method|
+          end
+
+          klass.add_method "stringValue", "std::string" do |method|
           end
         end
       end
