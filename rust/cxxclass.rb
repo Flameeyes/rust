@@ -83,7 +83,12 @@ module Rust
                             :klass => self
                           })
 
-      yield method
+      begin
+        yield method
+      rescue LocalJumpError
+        # Ignore this, we can easily have methods without parameters
+        # or other extra informations.
+      end
 
       @methods << method
 
