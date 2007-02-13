@@ -36,6 +36,10 @@ static inline int32_t ruby2int(VALUE rval) {
 }
 
 /* Standard conversions for stdint-provided types */
+/* TODO: replace these with something more comples but that properly
+   handle a try to convert a number too big to stay into the size
+   requested.
+*/
 #define ruby2uint32_t ruby2uint
 #define ruby2uint16_t ruby2uint
 #define ruby2uint8_t  ruby2uint
