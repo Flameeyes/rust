@@ -28,16 +28,16 @@ module Rust::Test
 class Extension < Test::Unit::TestCase
   def setup
     require 'cppclass_rb'
-
-    @instance = RustTest::TestClass.new
   end
 
   def test_01integers
+    @instance = RustTest::TestClass.new
     @instance.action1 1234
     assert @instance.integerValue == 1234, "The integer value does not correspond"
   end
 
   def test_02strings
+    @instance = RustTest::TestClass.new
     @instance.action2 "a test"
     assert @instance.stringValue == "a test", "The string value does not correspond"
   end
