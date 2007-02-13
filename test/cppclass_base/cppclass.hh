@@ -22,7 +22,7 @@
  */
 
 #include <string>
-#include <cstdint>
+#include <stdint.h>
 
 class TestClass {
 public:
