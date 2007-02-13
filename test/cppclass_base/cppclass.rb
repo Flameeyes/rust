@@ -39,6 +39,9 @@ class CppClassBase < Test::Unit::TestCase
           klass.add_method "action1" do |method|
             method.add_parameter "uint32_t", "val"
           end
+
+          klass.add_method "integerValue", "uint32_t" do |method|
+          end
         end
       end
     end
