@@ -76,4 +76,14 @@ static inline VALUE cxx2ruby(const std::string &str) {
   return rb_str_new2(str.c_str());
 }
 
+/* Booleans conversion */
+
+static inline VALUE cxx2ruby(bool val) {
+  return val ? Qtrue : Qfalse;
+}
+
+static inline bool ruby2bool(VALUE rval) {
+  return !( rval == Qnil || rval == Qfalse );
+}
+
 #endif
