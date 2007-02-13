@@ -27,21 +27,19 @@
 #include <stdint.h>
 #include <ruby.h>
 
-static inline uint64_t ruby2uint(VALUE rval) {
+static inline uint32_t ruby2uint(VALUE rval) {
   return NUM2UINT(rval);
 }
 
-static inline int64_t ruby2int(VALUE rval) {
+static inline int32_t ruby2int(VALUE rval) {
   return NUM2INT(rval);
 }
 
 /* Standard conversions for stdint-provided types */
-#define ruby2uint64_t ruby2uint
 #define ruby2uint32_t ruby2uint
 #define ruby2uint16_t ruby2uint
 #define ruby2uint8_t  ruby2uint
 
-#define ruby2int64_t  ruby2int
 #define ruby2int32_t  ruby2int
 #define ruby2int16_t  ruby2int
 #define ruby2int8_t   ruby2int
