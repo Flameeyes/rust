@@ -36,17 +36,14 @@ module Rust
         params[:parent] = params[:klass]
         super
 
-        @varname = "f#{@parent.namespace.name.gsub("::","_")}_#{@parent.name}_#{@name}"
+        @varname =
+        "f#{@parent.namespace.name.gsub("::","_")}_#{@parent.name}_#{@name}"
+
+        @definition_template = Templates["CxxMethodStub"]
       end
 
       def raw_call(param = nil)
         "tmp->#{super(param)}"
-      end
-
-      def definition
-        Templates["CxxMethodStub"].
-          gsub("!method_prototype!", prototype).
-          gsub("!method_call!", stub)
       end
     end
 
@@ -62,6 +59,8 @@ module Rust
                 :bindname => "initialize",
                 :name => klass.name
               })
+
+        @definition_template = Templates["CxxConstructorStub"]
       end
 
       def raw_call(param = nul)
@@ -70,12 +69,6 @@ module Rust
 
       def bind_call(param = nil, params = nil)
         "#{raw_call(param)};\n"
-      end
-
-      def definition
-        Templates["CxxConstructorStub"].
-          gsub("!method_prototype!", prototype).
-          gsub("!method_call!", stub)
       end
     end
   end

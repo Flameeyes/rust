@@ -71,6 +71,8 @@ module Rust
       end
       
       @aliases << nocamel_bindname unless nocamel_bindname == @bindname
+
+      @prototype_template = "VALUE !function_varname! ( VALUE self !function_parameters! )"
     end
 
     # Adds an alias for the function.
@@ -92,9 +94,20 @@ module Rust
       param = Parameter.new(name, type, optional, default)
       @parameters << param
 
-      @variable = true if optional or default != nil
+      if optional or default != nil
+        @variable = true 
+        @prototype_template = "VALUE !function_varname! ( int argc, VALUE *argv, VALUE self )"
+      end
 
       return param
+    end
+
+    # Set different, non-default templates for functions, that can be used
+    # when many functions of the bound C/C++ library contains functions
+    # that require to be handled in a particular way.
+    def set_custom(prototype, definition)
+      @definition_template = definition
+      @prototype_template = prototype
     end
 
     def params_conversion(nparms = nil, params = nil)
@@ -112,19 +125,16 @@ module Rust
     end
     private :params_conversion
     
+    def definition
+      @definition_template.
+        gsub("!function_prototype!", prototype).
+        gsub("!function_call!", stub)
+    end
+
     def prototype
-      case
-        # when @template
-        #   @template[:prototype].gsub('!varname!', varname)
-        # when @custom
-        #   @custom_prototype
-      when @variable
-        "VALUE #{varname} ( int argc, VALUE *argv, VALUE self )"
-      else
-        "VALUE #{varname} ( VALUE self " +
-          @parameters.collect { |p| ", VALUE #{p.name}" }.join +
-          " )"
-      end
+      @prototype_template.
+        gsub("!function_varname!", varname).
+        gsub("!function_parameters!", @parameters.collect { |p| ", VALUE #{p.name}" }.join)
     end
     
     def raw_call(param = nil, params = nil)

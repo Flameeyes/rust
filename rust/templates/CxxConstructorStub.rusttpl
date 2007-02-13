@@ -2,13 +2,13 @@
 // Template of a C++ Constructor stub, the function used to convert the
 // parameters from Ruby objects to C++, and then call the real C++ constructor.
 
-!method_prototype! {
+!function_prototype! {
   !cxx_class_name!* tmp;
   Data_Get_Struct(self, !cxx_class_name!, tmp);
 
   // The exception is thrown already by ruby2*
 
-  !method_call!;
+  !function_call!;
 
   DATA_PTR(self) = tmp;
   !class_ptrmap![self] = tmp;
