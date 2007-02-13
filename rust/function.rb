@@ -46,7 +46,7 @@ module Rust
       def conversion(index = nil)
         paramname = index ? "argv[#{index}]" : @name
 
-        "ruby2#{@type.sub("*", "Ptr").gsub("::", "_")}(#{paramname}),"
+        "ruby2#{@type.sub("*", "Ptr").gsub("::", "_").gsub(' ', '')}(#{paramname}),"
       end
     end
 
