@@ -30,7 +30,7 @@ module Rust
     # Class representing a function or method parameter
     class Parameter
 
-      attr_reader :type, :name, :optiona, :default
+      attr_reader :type, :name, :optional, :default
 
       def initialize(type, name, optional, default) #:notnew:
         @type = type
