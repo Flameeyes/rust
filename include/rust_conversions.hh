@@ -35,6 +35,14 @@ static inline int32_t ruby2int(VALUE rval) {
   return NUM2INT(rval);
 }
 
+static inline VALUE cxx2ruby(int32_t val) {
+  return INT2FIX(val);
+}
+
+static inline VALUE cxx2ruby(uint32_t val) {
+  return INT2FIX(val);
+}
+
 /* Standard conversions for stdint-provided types */
 /* TODO: replace these with something more comples but that properly
    handle a try to convert a number too big to stay into the size
