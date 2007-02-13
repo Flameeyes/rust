@@ -12,5 +12,10 @@
 
   DATA_PTR(self) = tmp;
   !class_ptrmap![self] = tmp;
+
+#ifdef DEBUG
+  fprintf(stderr, "rust: creating new instance of !cxx_class_name! (%p) with value %x\n", tmp, self);
+#endif
+
   return self;
 }

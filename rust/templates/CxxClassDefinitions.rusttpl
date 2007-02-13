@@ -35,7 +35,11 @@ VALUE cxx2ruby(!cxx_class_name!* instance) {
 
       VALUE rval = Data_Wrap_Struct(klass, 0, 0, (void*)instance);
       !class_ptrmap![rval] = instance;
-      // fprintf(stderr, "Wrapping instance %p in value %x (type %d)\\n", instance, rval, TYPE(rval));
+
+#ifdef DEBUG      
+      fprintf(stderr, "rust: wrapping instance %p in value %x (type %d)\\n", instance, rval, TYPE(rval));
+#endif
+
       return rval;
    }
 }

@@ -12,6 +12,10 @@
 #include <rust_conversions.hh>
 #include "!bindings_name!.hh"
 
+#ifdef DEBUG
+#include <stdio.h> /* Used for fprintf */
+#endif
+
 !modules_definition!
 
 extern "C" {
