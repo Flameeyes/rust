@@ -20,8 +20,7 @@
 # CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-require 'rust/templates'
-require 'rust/bindings'
+require 'pathname'
 
 # Rust is a Ruby bindings generator, developed by Diego Pettenò
 # <flameeyes@gmail.com>, based on a simpler Ruby bindings generator
@@ -43,4 +42,26 @@ require 'rust/bindings'
 # write all the generic code, as that does not really change beside
 # names, types and parameters.
 module Rust
+
+  # The Template singleton class is used to simulate a big hash of
+  # templates, loaded with the data from the templates/ subdirectory.
+  # In truth the templates are loaded only when requested, removing
+  # the one-line comments found inside the files (as they are usually
+  # just for documenting that particular template). 
+  class Templates
+    @cache = { }
+    @tpls_dir = (Pathname File.dirname(__FILE__)) + "templates"
+
+    def Templates.[](name)
+      return @cache[name] if @cache[name]
+
+      pn = @tpls_dir + "#{name}.rusttpl"
+      raise "Template #{name} not found." unless pn.exist?
+
+      @cache[name] = pn.read.gsub(/\/\/.*$\n?/, '')
+      return @cache[name]
+    end
+  end
 end
+
+require 'rust/bindings'
