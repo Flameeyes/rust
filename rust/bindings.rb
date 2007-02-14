@@ -20,6 +20,8 @@
 # CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+require 'rust/namespace'
+
 module Rust
   # Base class to use to create bindings for ruby.
   # You shouldn't instantiate this manually, but rather use the
@@ -41,8 +43,9 @@ module Rust
     # included header is a local header.
     HeaderLocal = "local"
 
-    def initialize(name) # :notnew:
+    def initialize(name, lang) # :notnew:
       @name = name
+      @lang = lang
 
       @modules = Array.new
       @cxx_includes = ""
@@ -59,15 +62,13 @@ module Rust
     # Please note that Rust always generates C++ code even when
     # binding a library written in C, as STL templates are used all
     # over the generics code.
-    def Bindings.create_bindings(type, name)
+    def Bindings.create_bindings(lang, name)
       bindings = 
-        case type
-        when Bindings::LangCxx
-          CxxBindings.new(name)
-#        when Bindings::C
-#          bindings = CBindings.new(name)
+        case lang
+        when Bindings::LangCxx, Bindings::LangC
+          bindings = Bindings.new(name, lang)
         else
-          raise ArgumentError, "#{type} is not a valid value for type parameter"
+          raise ArgumentError, "#{lang} is not a valid value for type parameter"
         end
 
       yield bindings
@@ -77,6 +78,31 @@ module Rust
       
       header.puts bindings.header
       unit.puts bindings.unit
+    end
+
+    # Adds an include header with the specified name.
+    # This function adds to the list of header files to include the
+    # one with the specified name.
+    #
+    # If the scope paramether is set to Bindings.HeaderLocal, the name of
+    # the header file will be enclosed in double quotes ("") while
+    # including it, while it will be included it in angle quotes if
+    # the parameter is set to Bindings.HeaderGlobal (the default).
+    def include_header(name, scope = Bindings::HeaderGlobal, lang = @lang)
+      name = 
+        case scope
+        when HeaderLocal then "\"#{name}\""
+        when HeaderGlobal then "<#{name}>"
+        else
+          raise ArgumentError, "#{scope} not a valid value for scope parameter."
+        end
+
+      case lang
+      when Bindings::LangCxx
+        @cxx_includes << "\n#include #{name}"
+      when Bindings::LangC
+        @c_includes << "\n#include #{name}"
+      end
     end
 
     # Binds a new Namespace to a Ruby module; the name parameter is
@@ -128,6 +154,3 @@ module Rust
   end
 
 end
-
-require 'rust/cxxbindings'
-
