@@ -1,0 +1,6 @@
+//-*-c++-*-
+// Template of a generic C function call
+
+!function_prototype! {
+  !function_call!
+}

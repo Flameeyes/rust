@@ -72,6 +72,7 @@ module Rust
       
       @aliases << nocamel_bindname unless nocamel_bindname == @bindname
 
+      @definition_template = Templates["FunctionDefinition"]
       @prototype_template = "VALUE !function_varname! ( VALUE self !function_parameters! )"
     end
 
