@@ -42,7 +42,7 @@ module Rust
 
       @children = []
 
-      @definition_template = Templates["ClassDefinitions"]
+      @definition_template = Templates["CxxClassDefinitions"]
 
       @varname = "#{@namespace.name.gsub("::", "_")}_#{@name}"
       if @parent
