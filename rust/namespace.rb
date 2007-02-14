@@ -34,6 +34,7 @@ module Rust
       @varname = "m#{@name.gsub("::", "_")}"
 
       @classes = Array.new
+      @functions = [] 
     end
 
     def add_cxx_class(name, parent = nil)
@@ -54,16 +55,41 @@ module Rust
       return klass
     end
 
+    def add_function(name, return_value = "void", bindname = name)
+      function = Function.new({ :name => name,
+                                :bindname => bindname,
+                                :return => return_value,
+                                :klass => self
+                              })
+
+      begin
+        yield function
+      rescue LocalJumpError
+        # Ignore this, we can easily have methods without parameters
+        # or other extra informations.
+      end
+
+      @functions << function
+
+      return function
+    end
+
     def declaration
-      Templates["ModuleDeclarations"].
-        gsub("!classes_declarations!", @classes.collect { |klass| klass.declaration }.join("\n")).
+      ret = Templates["ModuleDeclarations"] +
+        @classes.collect { |klass| klass.declaration }.join("\n") +
+        @functions.collect { |funct| funct.prototype }.join("\n")
+
+      ret.
         gsub("!module_name!", @name).
         gsub("!namespace_varname!", varname)
     end
     
     def definition
-      Templates["ModuleDefinitions"].
-        gsub("!classes_definitions!", @classes.collect { |klass| klass.definition }.join("\n")).
+      ret = Templates["ModuleDefinitions"] +
+        @classes.collect { |klass| klass.definition }.join("\n") +
+        @functions.collect { |funct| funct.definition }.join("\n")
+
+      ret.
         gsub("!module_name!", @name).
         gsub("!namespace_varname!", varname)
     end
@@ -76,6 +102,7 @@ module Rust
       end
 
       ret << @classes.collect { |klass| klass.initialization }.join("\n")
+      ret << @functions.collect { |funct| funct.initialization }.join("\n")
       
       ret.
         gsub("!module_name!", @name).
