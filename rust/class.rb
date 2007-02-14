@@ -136,7 +136,7 @@ module Rust
         "f#{@parent.namespace.name.gsub("::","_")}_#{@parent.name}_#{@name}"
 
         @definition_template = Templates["CxxMethodStub"]
-        @initialization_template = Template["MethodInitBinding"]
+        @initialization_template = Templates["MethodInitBinding"]
       end
     end
 
