@@ -30,6 +30,8 @@ module Rust
 
       @cname = type
       @varcname = @cname.sub("*", "Ptr").gsub("::", "_").gsub(' ', '')
+
+      @definition_template = Templates["CWrapperClassDefinitions"]
     end
 
     def add_constructor(name)

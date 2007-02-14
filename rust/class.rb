@@ -52,7 +52,6 @@ module Rust
       @varcname = @cname.sub("*", "Ptr").gsub("::", "_").gsub(' ', '')
 
       @declaration_template = Templates["ClassDeclarations"]
-      @definition_template = Templates["ClassDefinitions"]
       @initialization_template = Templates["ClassInitialize"]
     end
 

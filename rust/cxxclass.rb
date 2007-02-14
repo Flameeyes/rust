@@ -42,6 +42,8 @@ module Rust
 
       @children = []
 
+      @definition_template = Templates["ClassDefinitions"]
+
       @varname = "#{@namespace.name.gsub("::", "_")}_#{@name}"
       if @parent
         @ptrmap = @parent.ptrmap
