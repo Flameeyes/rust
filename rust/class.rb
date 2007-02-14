@@ -20,6 +20,8 @@
 # CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+require 'rust/function'
+
 module Rust
   class Class
     attr_reader :name, :cname
@@ -47,6 +49,25 @@ module Rust
       @function_free = "#{varname}_free"
 
       @cname = @namespace.cxxname ? "#{@namespace.cxxname}::#{@name}" : @name
+    end
+
+    # Adds a new constructor for the class.
+    # This function creates a new constructor method for the C/C++
+    # class to bind, and yields it so that parameters can be added
+    # afterward.
+    def add_constructor
+      constructor = self.class::Constructor.new(self)
+
+      begin
+        yield constructor
+      rescue LocalJumpError
+        # Ignore this, we can easily have methods without parameters
+        # or other extra informations.
+      end
+
+      @methods << constructor
+
+      return constructor
     end
 
     def declaration
@@ -86,5 +107,27 @@ module Rust
         gsub("!c_class_basename!", @name.split("::").last).
         gsub("!parent_varname!", @parent_varname)
     end
+
+    # This class is used to represente the constructor of a C++ class
+    # bound in a Ruby extension.
+    class Constructor < Function
+      
+      # Initialisation function, calls Function.initialise, but accepts
+      # only a single parameter, the class the constructor belong to.
+      def initialize(klass) # :notnew:
+        super({
+                :parent => klass,
+                :bindname => "initialize",
+                :name => klass.name
+              })
+
+        @definition_template = Templates["ConstructorStub"]
+      end
+
+      def bind_call(param = nil, params = nil)
+        "#{raw_call(param, params)};\n"
+      end
+    end
+
   end
 end

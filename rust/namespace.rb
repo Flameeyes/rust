@@ -45,12 +45,12 @@ module Rust
       return klass
     end
 
-    def add_class_wrapper(name, parent = nil)
-      klass = ClassWrapper.new(name, self, parent)
+    def add_class_wrapper(name, type)
+      klass = ClassWrapper.new(name, type, self)
       
       yield klass
 
-      @cwrappers << klass
+      @classes << klass
       return klass
     end
 

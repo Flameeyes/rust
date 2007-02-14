@@ -57,25 +57,6 @@ module Rust
       end
     end
 
-    # Adds a new constructor for the class.
-    # This function creates a new constructor method for the C++
-    # class to bind, and yields it so that parameters can be added
-    # afterward.
-    def add_constructor
-      constructor = Constructor.new(self)
-
-      begin
-        yield constructor
-      rescue LocalJumpError
-        # Ignore this, we can easily have methods without parameters
-        # or other extra informations.
-      end
-
-      @methods << constructor
-
-      return constructor
-    end
-
     def add_method(name, return_value = "void", bindname = name)
       method = Method.new({ :name => name,
                             :bindname => bindname,
@@ -115,7 +96,33 @@ module Rust
       return ret
     end
 
+    # This class is used to represent a method for a C++ class bound
+    # in a Ruby extension. Through an object of this class you can add
+    # parameters and more to the method.
+    class Method < Function
+      
+      # Initialisation function, calls Function.initialize and sets
+      # the important parameters that differs from a generic function
+      def initialize(params) # :notnew:
+        params[:parent] = params[:klass]
+        super
+
+        @varname =
+        "f#{@parent.namespace.name.gsub("::","_")}_#{@parent.name}_#{@name}"
+
+        @definition_template = Templates["CxxMethodStub"]
+      end
+
+      def raw_call(param = nil, params = nil)
+        "tmp->#{super(param, params)}"
+      end
+    end
+
+    class Constructor < Class::Constructor
+      def raw_call(param = nil, params = nil)
+        "tmp = new #{super(param, params)}"
+      end
+    end
+
   end
 end
-
-require 'rust/cxxmethod'

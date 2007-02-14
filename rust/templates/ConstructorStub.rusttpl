@@ -6,7 +6,7 @@
   !c_class_name!* tmp;
   Data_Get_Struct(self, !c_class_name!, tmp);
 
-  // The exception is thrown already by ruby2*
+  /* The exception is thrown already by ruby2* if not found */
 
   !function_call!;
 
