@@ -191,7 +191,7 @@ module Rust
         }.join("\n")
 
       ret.
-        gsub!("!parent_varname!", @parent.varname)
+        gsub!("!parent_varname!", @parent.varname).
         gsub!("!function_bindname!", @bindname).
         gsub!("!function_varname!", @varname).
         gsub!("!function_paramcount!", paramcount.to_s)
