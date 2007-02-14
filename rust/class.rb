@@ -25,7 +25,7 @@ require 'rust/function'
 module Rust
   class Class
     attr_reader :name, :cname
-    attr_reader :varname, :ptrmap, :function_free, :parent_varname
+    attr_reader :varname, :varcname, :ptrmap, :function_free, :parent_varname
 
     # Rust::Namespace object for the class, used to get the proper C++
     # name.
@@ -49,6 +49,7 @@ module Rust
       @function_free = "#{varname}_free"
 
       @cname = @namespace.cxxname ? "#{@namespace.cxxname}::#{@name}" : @name
+      @varcname = @cname.sub("*", "Ptr").gsub("::", "_").gsub(' ', '')
 
       @declaration_template = Templates["ClassDeclarations"]
       @definition_template = Templates["ClassDefinitions"]
@@ -82,6 +83,7 @@ module Rust
 
       ret.
         gsub!("!class_varname!", varname).
+        gsub!("!class_varcname!", varcname).
         gsub!("!c_class_name!", cname).
         gsub!("!class_ptrmap!", ptrmap)
     end
@@ -94,6 +96,7 @@ module Rust
 
       ret.
         gsub!("!class_varname!", varname).
+        gsub!("!class_varcname!", varcname).
         gsub!("!c_class_name!", cname).
         gsub!("!class_ptrmap!", ptrmap).
         gsub!("!class_free_function!", @function_free)
