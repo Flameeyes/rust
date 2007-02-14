@@ -81,9 +81,9 @@ module Rust
       end
 
       ret.
-        gsub("!class_varname!", varname).
-        gsub("!c_class_name!", cname).
-        gsub("!class_ptrmap!", ptrmap)
+        gsub!("!class_varname!", varname).
+        gsub!("!c_class_name!", cname).
+        gsub!("!class_ptrmap!", ptrmap)
     end
     
     def definition
@@ -93,13 +93,13 @@ module Rust
       end
 
       ret.
-        gsub("!class_varname!", varname).
-        gsub("!c_class_name!", cname).
-        gsub("!class_ptrmap!", ptrmap).
-        gsub("!class_free_function!", @function_free)
+        gsub!("!class_varname!", varname).
+        gsub!("!c_class_name!", cname).
+        gsub!("!class_ptrmap!", ptrmap).
+        gsub!("!class_free_function!", @function_free)
 
       if respond_to? "test_children"
-        ret.gsub("!test_children!", test_children)
+        ret.gsub!("!test_children!", test_children)
       end
 
       return ret
@@ -112,9 +112,9 @@ module Rust
       end
 
       ret.
-        gsub("!class_varname!", varname).
-        gsub("!c_class_basename!", @name.split("::").last).
-        gsub("!parent_varname!", @parent_varname)
+        gsub!("!class_varname!", varname).
+        gsub!("!c_class_basename!", @name.split("::").last).
+        gsub!("!parent_varname!", @parent_varname)
     end
 
     # This class is used to represente the constructor of a C++ class
