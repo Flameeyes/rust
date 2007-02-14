@@ -1,3 +1,3 @@
 //-*-c++-*-
 
-extern VALUE m!module_name!;
+extern VALUE r!namespace_varname!;

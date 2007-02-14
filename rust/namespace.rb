@@ -31,7 +31,7 @@ module Rust
     def initialize(name, cxxname)
       @name = name
       @cxxname = cxxname
-      @varname = "m#{@name.gsub("::", "_")}"
+      @varname = "#{@name.gsub("::", "_")}"
 
       @classes = Array.new
       @functions = [] 
@@ -59,7 +59,7 @@ module Rust
       function = Function.new({ :name => name,
                                 :bindname => bindname,
                                 :return => return_value,
-                                :klass => self
+                                :parent => self
                               })
 
       begin
@@ -96,9 +96,9 @@ module Rust
     
     def initialization
       unless @name.include?("::")
-        ret = "#{varname} = rb_define_module(\"#{@name}\");\n"
+        ret = "r#{varname} = rb_define_module(\"#{@name}\");\n"
       else
-        ret = "#{varname} = rb_define_module_under(m#{@name.split("::")[0..-2].join("_")}, \"#{@name.split("::").last}\");\n"
+        ret = "r#{varname} = rb_define_module_under(m#{@name.split("::")[0..-2].join("_")}, \"#{@name.split("::").last}\");\n"
       end
 
       ret << @classes.collect { |klass| klass.initialization }.join("\n")
