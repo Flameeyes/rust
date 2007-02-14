@@ -94,23 +94,7 @@ module Rust
       return ret
     end
 
-    # This class is used to represent a method for a C++ class bound
-    # in a Ruby extension. Through an object of this class you can add
-    # parameters and more to the method.
-    class Method < Function
-      
-      # Initialisation function, calls Function.initialize and sets
-      # the important parameters that differs from a generic function
-      def initialize(params) # :notnew:
-        params[:parent] = params[:klass]
-        super
-
-        @varname =
-        "f#{@parent.namespace.name.gsub("::","_")}_#{@parent.name}_#{@name}"
-
-        @definition_template = Templates["CxxMethodStub"]
-      end
-
+    class Method < Class::Method
       def raw_call(param = nil, params = nil)
         "tmp->#{super(param, params)}"
       end
