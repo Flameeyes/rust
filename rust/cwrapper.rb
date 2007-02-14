@@ -29,6 +29,7 @@ module Rust
       super(name, namespace)
 
       @cname = type
+      @varcname = @cname.sub("*", "Ptr").gsub("::", "_").gsub(' ', '')
     end
 
     def add_constructor(name)
