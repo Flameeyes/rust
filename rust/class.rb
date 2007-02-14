@@ -96,8 +96,13 @@ module Rust
         gsub("!class_varname!", varname).
         gsub("!c_class_name!", cname).
         gsub("!class_ptrmap!", ptrmap).
-        gsub("!test_children!", test_children).
         gsub("!class_free_function!", @function_free)
+
+      if respond_to? "test_children"
+        ret.gsub("!test_children!", test_children)
+      end
+
+      return ret
     end
     
     def initialization
