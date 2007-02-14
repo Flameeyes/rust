@@ -25,6 +25,8 @@ module Rust
   # C class wrapper class, this is used to provide support for those
   # wrappers around C libraries that are bound by Rust.
   class ClassWrapper < Class
+    attr_reader :cleanup_functions
+
     def initialize(name, type, namespace) # :notnew:
       super(name, namespace)
 

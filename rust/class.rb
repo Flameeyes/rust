@@ -104,6 +104,10 @@ module Rust
         ret.gsub!("!test_children!", test_children)
       end
 
+      if respond_to? "cleanup_functions"
+        ret.gsub!("!cleanup_functions!", '')
+      end
+
       return ret
     end
     
