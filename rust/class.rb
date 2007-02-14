@@ -49,6 +49,10 @@ module Rust
       @function_free = "#{varname}_free"
 
       @cname = @namespace.cxxname ? "#{@namespace.cxxname}::#{@name}" : @name
+
+      @declaration_template = Templates["ClassDeclarations"]
+      @definition_template = Templates["ClassDefinitions"]
+      @initialization_template = Templates["ClassInitialize"]
     end
 
     # Adds a new constructor for the class.

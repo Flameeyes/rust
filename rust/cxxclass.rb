@@ -42,17 +42,13 @@ module Rust
 
       @children = []
 
-      @declaration_template = Templates["CxxClassDeclarations"]
-      @definition_template = Templates["CxxClassDefinitions"]
-      @initialization_template = Templates["CxxClassInitialize"]
-
       @varname = "#{@namespace.name.gsub("::", "_")}_#{@name}"
       if @parent
         @ptrmap = @parent.ptrmap
         @function_free = @parent.function_free
         @parent_varname = "r#{@parent.varname}"
       else
-        @declaration_template << Templates["CxxStandaloneClassDeclarations"]
+        @declaration_template << Templates["StandaloneClassDeclarations"]
         @definition_template << Templates["CxxStandaloneClassDefinitions"]
       end
     end
