@@ -134,12 +134,16 @@ module Rust
         gsub("!function_cname!", @name)
     end
 
+    def declaration
+      "#{prototype};"
+    end
+    
     def prototype
       @prototype_template.
         gsub("!function_varname!", varname).
         gsub("!function_parameters!", @parameters.collect { |p| ", VALUE #{p.name}" }.join)
     end
-    
+
     def raw_call(param = nil, params = nil)
       "#{@name}(#{params_conversion(param, params)})"
     end

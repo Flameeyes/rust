@@ -75,10 +75,8 @@ module Rust
     end
 
     def declaration
-      ret = @declaration_template
-      @methods.each do |method|
-        ret << "#{method.prototype};"
-      end
+      ret = @declaration_template +
+        @methods.collect { |method| method.declaration }.join("\n")
 
       ret.
         gsub!("!class_varname!", varname).

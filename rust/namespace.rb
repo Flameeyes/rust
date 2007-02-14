@@ -77,7 +77,7 @@ module Rust
     def declaration
       ret = Templates["ModuleDeclarations"] +
         @classes.collect { |klass| klass.declaration }.join("\n") +
-        @functions.collect { |funct| funct.prototype }.join("\n")
+        @functions.collect { |funct| funct.declaration }.join("\n")
 
       ret.
         gsub("!module_name!", @name).
