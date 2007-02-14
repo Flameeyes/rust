@@ -74,6 +74,7 @@ module Rust
 
       @definition_template = Templates["FunctionDefinition"]
       @prototype_template = "VALUE !function_varname! ( VALUE self !function_parameters! )"
+      @initialization_template = Templates["FunctionInitBinding"]
     end
 
     # Adds an alias for the function.
@@ -185,7 +186,7 @@ module Rust
         else @parameters.size
         end
 
-      ret = Templates["FunctionInitBinding"] +
+      ret = @initialization_template +
         @aliases.collect { |alii|
           Templates["FunctionInitAlias"].gsub("!function_alias!", alii)
         }.join("\n")
