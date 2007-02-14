@@ -181,18 +181,17 @@ module Rust
         else @parameters.size
         end
 
-      ret = Templates["FunctionInitBinding"].
-        gsub("!parent_varname!", @parent.varname).
-        gsub("!function_bindname!", @bindname).
-        gsub("!function_varname!", @varname).
-        gsub("!function_paramcount!", paramcount.to_s)
+      ret = Templates["FunctionInitBinding"] +
+        @aliases.collect { |alii|
+          Templates["FunctionInitAlias"].gsub("!function_alias!", alii)
+        }.join("\n")
 
-      @aliases.each do |alii|
-        ret << Templates["FunctionInitAlias"].
-          gsub("!parent_varname!", @parent.varname).
-          gsub("!function_alias!", alii).
-          gsub("!function_bindname!", @bindname)
-      end
+      ret.
+        gsub!("!function_bindname!", @bindname).
+        gsub!("!function_varname!", @varname).
+        gsub!("!function_paramcount!", paramcount.to_s)
+
+      ret.gsub!("!parent_varname!", @parent.varname) if @parent
 
       return ret
     end
