@@ -1,5 +1,5 @@
 //-*-c++-*-
-// Template for the initialization calls for a C++ class 
+// Template for the initialization calls for a C/C++ class 
 
   r!class_varname! = rb_define_class_under(!namespace_varname!,
     "!c_class_basename!", !parent_varname!);
