@@ -3,8 +3,8 @@
 // parameters from Ruby objects to C++, and then call the real C++ constructor.
 
 !function_prototype! {
-  !cxx_class_name!* tmp;
-  Data_Get_Struct(self, !cxx_class_name!, tmp);
+  !c_class_name!* tmp;
+  Data_Get_Struct(self, !c_class_name!, tmp);
 
   // The exception is thrown already by ruby2*
 
@@ -14,7 +14,7 @@
   !class_ptrmap![self] = tmp;
 
 #ifdef DEBUG
-  fprintf(stderr, "rust: creating new instance of !cxx_class_name! (%p) with value %x\n", tmp, self);
+  fprintf(stderr, "rust: creating new instance of !c_class_name! (%p) with value %x\n", tmp, self);
 #endif
 
   return self;

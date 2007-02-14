@@ -21,6 +21,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 require "rust/cxxclass"
+require "rust/cwrapper"
 
 module Rust
 
@@ -32,8 +33,7 @@ module Rust
       @cxxname = cxxname
       @varname = "m#{@name.gsub("::", "_")}"
 
-      @cxxclasses = Array.new
-      @cwrappers = Array.new
+      @classes = Array.new
     end
 
     def add_cxx_class(name, parent = nil)
@@ -41,22 +41,31 @@ module Rust
 
       yield klass
 
-      @cxxclasses << klass
+      @classes << klass
+      return klass
+    end
+
+    def add_class_wrapper(name, parent = nil)
+      klass = ClassWrapper.new(name, self, parent)
+      
+      yield klass
+
+      @cwrappers << klass
       return klass
     end
 
     def declaration
       Templates["ModuleDeclarations"].
+        gsub("!classes_declarations!", @classes.collect { |klass| klass.declaration }.join("\n")).
         gsub("!module_name!", @name).
-        gsub("!cxx_classes_declarations!", @cxxclasses.collect { |klass| klass.declaration }.join("\n")).
-        gsub("!c_class_wrappers_declarations!", @cwrappers.collect { |klass| klass.declaration }.join("\n"))
+        gsub("!namespace_varname!", varname)
     end
     
     def definition
       Templates["ModuleDefinitions"].
+        gsub("!classes_definitions!", @classes.collect { |klass| klass.definition }.join("\n")).
         gsub("!module_name!", @name).
-        gsub("!cxx_classes_definitions!", @cxxclasses.collect { |klass| klass.definition }.join("\n")).
-        gsub("!c_class_wrappers_definitions!", @cwrappers.collect { |klass| klass.definition }.join("\n"))
+        gsub("!namespace_varname!", varname)
     end
     
     def initialization
@@ -66,10 +75,11 @@ module Rust
         ret = "#{varname} = rb_define_module_under(m#{@name.split("::")[0..-2].join("_")}, \"#{@name.split("::").last}\");\n"
       end
 
-      ret << @cxxclasses.collect { |klass| klass.initialization }.join("\n")
-      ret << @cwrappers.collect { |klass| klass.initialization }.join("\n")
+      ret << @classes.collect { |klass| klass.initialization }.join("\n")
       
-      ret
+      ret.
+        gsub("!module_name!", @name).
+        gsub("!namespace_varname!", varname)
     end
   end
 

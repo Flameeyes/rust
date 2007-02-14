@@ -20,17 +20,10 @@
 # CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-require 'rust/cxxmethod'
+require 'rust/class'
 
 module Rust
-  class CxxClass
-    attr_reader :name
-    attr_reader :varname, :ptrmap, :function_free, :parent_varname
-
-    # Rust::Namespace object for the class, used to get the proper C++
-    # name.
-    attr_reader :namespace
-
+  class CxxClass < Class
     # This function initializes the CxxClass instance by setting the
     # values to the attributes defining its parent, namespace, name
     # and a few other needed information.
@@ -44,22 +37,23 @@ module Rust
     #
     # *FIXME*: multiple inheritance can make Rust bail out, badly.
     def initialize(name, namespace, parent = nil) # :notnew:
-      @name = name
-      @namespace = namespace
+      super(name, namespace)
       @parent = parent
 
-      @children = Array.new
-      @methods = Array.new
+      @children = []
+
+      @declaration_template = Templates["CxxClassDeclarations"]
+      @definition_template = Templates["CxxClassDefinitions"]
+      @initialization_template = Templates["CxxClassInitialize"]
 
       @varname = "#{@namespace.name.gsub("::", "_")}_#{@name}"
       if @parent
         @ptrmap = @parent.ptrmap
         @function_free = @parent.function_free
-        @parent_varname = "c#{@parent.varname}"
+        @parent_varname = "r#{@parent.varname}"
       else
-        @ptrmap = "#{@namespace.name.gsub("::", "_")}_#{@name}_ptrMap"
-        @function_free = "#{varname}_free"
-        @parent_varname = "rb_cObject"
+        @declaration_template << Templates["CxxStandaloneClassDeclarations"]
+        @definition_template << Templates["CxxStandaloneClassDefinitions"]
       end
     end
 
@@ -121,49 +115,7 @@ module Rust
       return ret
     end
 
-    def declaration
-      ret = (Templates["CxxClassDeclarations"] + (@parent ? "" : Templates["CxxStandaloneClassDeclarations"] )).
-        gsub("!class_varname!", varname).
-        gsub("!cxx_class_name!", "#{@namespace.cxxname}::#{@name}").
-        gsub("!class_ptrmap!", ptrmap)
-
-      @methods.each do |method|
-        ret << "#{method.prototype};"
-      end
-
-      return ret
-    end
-    
-    def definition
-      ret = (Templates["CxxClassDefinitions"] + (@parent ? "" : Templates["CxxStandaloneClassDefinitions"] )).
-        gsub("!class_varname!", varname).
-        gsub("!cxx_class_name!", "#{@namespace.cxxname}::#{@name}").
-        gsub("!class_ptrmap!", ptrmap).
-        gsub("!test_children!", test_children).
-        gsub("!class_free_function!", @function_free)
-
-      @methods.each do |method|
-        ret << method.definition.
-          gsub("!class_ptrmap!", ptrmap).
-          gsub("!class_varname!", varname).
-          gsub("!cxx_class_name!", "#{@namespace.cxxname}::#{@name}")
-      end
-
-      return ret
-    end
-    
-    def initialization
-      ret = Templates["CxxClassInitialize"].
-        gsub("!class_varname!", varname).
-        gsub("!cxx_class_basename!", @name.split("::").last).
-        gsub("!parent_varname!", @parent_varname).
-        gsub("!namespace_varname!", @namespace.varname)
-
-      @methods.each do |method|
-        ret << method.initialization
-      end
-
-      return ret
-    end
   end
 end
+
+require 'rust/cxxmethod'
