@@ -35,6 +35,8 @@ module Rust
 
       @definition_template = Templates["CWrapperClassDefinitions"]
       @declaration_template << Templates["StandaloneClassDeclarations"]
+
+      add_expansion 'cleanup_functions', "''"
     end
 
     def add_constructor(name)

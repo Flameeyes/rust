@@ -40,7 +40,7 @@ module Rust
       super(name, namespace)
       @parent = parent
 
-      @children = []
+      @children_classes = []
 
       @definition_template = Templates["CxxClassDefinitions"]
 
@@ -53,6 +53,8 @@ module Rust
         @declaration_template << Templates["StandaloneClassDeclarations"]
         @definition_template << Templates["CxxStandaloneClassDefinitions"]
       end
+
+      add_expansion 'test_children'
     end
 
     def add_method(name, return_value = "void", bindname = name)
@@ -69,7 +71,7 @@ module Rust
         # or other extra informations.
       end
 
-      @methods << method
+      @children << method
 
       return method
     end
@@ -77,11 +79,11 @@ module Rust
     # This function is used during ruby to C/C++ conversion of the
     # types, and test for the deepest class the pointer is valid for.
     def test_children
-      return unless @children
+      return unless @children_classes
       
       ret = ""
       
-      @children.each do |klass|
+      @children_classes.each do |klass|
         ret << %@
      if ( dynamic_cast< #{klass.namespace.cxxname}::#{klass.name}* >(instance) != NULL )
      {

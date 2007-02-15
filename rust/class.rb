@@ -20,10 +20,11 @@
 # CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+require 'rust/element'
 require 'rust/function'
 
 module Rust
-  class Class
+  class Class < Element
     attr_reader :name, :cname
     attr_reader :varname, :varcname, :ptrmap, :function_free, :parent_varname
 
@@ -37,10 +38,10 @@ module Rust
     #
     # Don't call this function directly, use Namespace.add_cxx_class
     def initialize(name, namespace) # :notnew:
+      super()
+
       @name = name
       @namespace = namespace
-
-      @methods = []
 
       @varname = "#{@namespace.name.gsub("::", "_")}_#{@name}"
       @parent_varname = "rb_cObject"
@@ -53,6 +54,14 @@ module Rust
 
       @declaration_template = Templates["ClassDeclarations"]
       @initialization_template = Templates["ClassInitialize"]
+
+      add_expansion 'class_varname', 'varname'
+      add_expansion 'class_varcname', 'varcname'
+      add_expansion 'c_class_name', 'cname'
+      add_expansion 'c_class_basename', '@name.split("::").last'
+      add_expansion 'class_ptrmap', 'ptrmap'
+      add_expansion 'class_free_function', '@function_free'
+      add_expansion 'parent_varname', '@parent_varname'
     end
 
     # Adds a new constructor for the class.
@@ -69,56 +78,9 @@ module Rust
         # or other extra informations.
       end
 
-      @methods << constructor
+      @children << constructor
 
       return constructor
-    end
-
-    def declaration
-      ret = @declaration_template +
-        @methods.collect { |method| method.declaration }.join("\n")
-
-      ret.
-        gsub!("!class_varname!", varname).
-        gsub!("!class_varcname!", varcname).
-        gsub!("!c_class_name!", cname).
-        gsub!("!class_ptrmap!", ptrmap)
-    end
-    
-    def definition
-      ret = @definition_template
-      @methods.each do |method|
-        ret << method.definition
-      end
-
-      ret.
-        gsub!("!class_varname!", varname).
-        gsub!("!class_varcname!", varcname).
-        gsub!("!c_class_name!", cname).
-        gsub!("!class_ptrmap!", ptrmap).
-        gsub!("!class_free_function!", @function_free)
-
-      if respond_to? "test_children"
-        ret.gsub!("!test_children!", test_children)
-      end
-
-      if respond_to? "cleanup_functions"
-        ret.gsub!("!cleanup_functions!", '')
-      end
-
-      return ret
-    end
-    
-    def initialization
-      ret = @initialization_template
-      @methods.each do |method|
-        ret << method.initialization
-      end
-
-      ret.
-        gsub!("!class_varname!", varname).
-        gsub!("!c_class_basename!", @name.split("::").last).
-        gsub!("!parent_varname!", @parent_varname)
     end
 
     # This class is used to represent a method for a C/C++ class bound

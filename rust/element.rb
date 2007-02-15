@@ -38,7 +38,7 @@ module Rust
       @initializatio_template = "#error Element #{self.inspect} missing initialization template"
     end
 
-    def add_expansion(key, value)
+    def add_expansion(key, value = key)
       @expansions[key] = value
     end
 
