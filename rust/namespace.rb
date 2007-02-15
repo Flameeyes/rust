@@ -34,7 +34,7 @@ module Rust
       super()
 
       @name = name
-      @cxxname = cxxname
+      @cxxname = cxxname == "" ? nil : cxxname
       @varname = "#{@name.gsub("::", "_")}"
 
       @declaration_template = Templates["ModuleDeclarations"]
