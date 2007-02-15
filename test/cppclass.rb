@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2007 Diego Pettenò <flameeyes@gmail.com>
+# Copyright (c) 2007 Diego Pettenò <flameeyes@gmail.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -20,41 +20,26 @@
 # CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-require 'rust'
-require 'test/unit'
-require 'pathname'
+require '../rust'
 
-module Rust::Test
+Rust::Bindings::create_bindings Rust::Bindings::LangCxx, "cppclass_rb" do |b|
+  b.include_header 'cppclass.hh', Rust::Bindings::HeaderLocal
 
-class CppClassBase < Test::Unit::TestCase
-  def setup
-    Rust::Bindings::create_bindings Rust::Bindings::LangCxx, "cppclass_rb" do |b|
-      b.include_header 'cppclass.hh', Rust::Bindings::HeaderLocal
-
-      b.add_namespace "RustTest", "" do |ns|
-        ns.add_cxx_class "TestClass" do |klass|
-          klass.add_constructor do |method|
-          end
-
-          klass.add_method "action1" do |method|
-            method.add_parameter "uint32_t", "val"
-          end
-
-          klass.add_method "action2" do |method|
-            method.add_parameter "char *", "string"
-          end
-
-          klass.add_method "integerValue", "uint32_t"
-          klass.add_method "stringValue", "std::string"
-        end
+  b.add_namespace "RustTestCppClass", "" do |ns|
+    ns.add_cxx_class "TestClass" do |klass|
+      klass.add_constructor do |method|
       end
+
+      klass.add_method "action1" do |method|
+        method.add_parameter "uint32_t", "val"
+      end
+
+      klass.add_method "action2" do |method|
+        method.add_parameter "char *", "string"
+      end
+
+      klass.add_method "integerValue", "uint32_t"
+      klass.add_method "stringValue", "std::string"
     end
   end
-
-  def test_presence
-    assert Pathname.new("cppclass_rb.cc").exist?, "The bindings unit wasn't created"
-    assert Pathname.new("cppclass_rb.hh").exist?, "The bindings header wasn't created"
-  end
-end
-
 end
