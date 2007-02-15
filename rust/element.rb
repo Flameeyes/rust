@@ -31,7 +31,7 @@ module Rust
   class Element
     def initialize
       @children = []
-      @expansions = { }
+      @expansions = []
 
       @declaration_template = "#error Element #{self.inspect} missing declaration template"
       @definition_template = "#error Element #{self.inspect} missing definition template"
@@ -39,11 +39,11 @@ module Rust
     end
 
     def add_expansion(key, value = key)
-      @expansions[key] = value
+      @expansions << [key, value]
     end
 
     def expand(str)
-      @expansions.each_pair do |key, expression|
+      @expansions.each do |key, expression|
         str.gsub!("!#{key}!", eval(expression))
       end
 

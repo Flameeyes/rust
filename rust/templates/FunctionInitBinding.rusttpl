@@ -5,3 +5,5 @@
 
   rb_define_module_function(r!parent_varname!, "!function_bindname!",
     RUBY_METHOD_FUNC(!function_varname!), !function_paramcount!);
+
+  !function_aliases!

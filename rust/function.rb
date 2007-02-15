@@ -21,12 +21,13 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 require 'set'
+require 'rust/element'
 
 module Rust
   # This class represent an abstracted bound function; it is not
   # supposed to be used directly, instead its subclass should be used,
   # like CxxClass::Method.
-  class Function
+  class Function < Element
     # Class representing a function or method parameter
     class Parameter
 
@@ -55,6 +56,8 @@ module Rust
     # Initialisation function, sets the important parameters from the
     # params hash provided, and the derived information that are needed.
     def initialize(params) # :notnew:
+      super()
+
       @return = params[:return]
       @name = params[:name]
       @bindname = params[:bindname]
@@ -72,9 +75,20 @@ module Rust
       
       @aliases << nocamel_bindname unless nocamel_bindname == @bindname
 
+      @declaration_template = "!function_prototype!;\n"
       @definition_template = Templates["FunctionDefinition"]
       @prototype_template = "VALUE !function_varname! ( VALUE self !function_parameters! )"
       @initialization_template = Templates["FunctionInitBinding"]
+
+      add_expansion 'function_aliases', '@aliases.collect { |alii| Templates["FunctionInitAlias"].gsub("!function_alias!", alii) }.join("\n")'
+      add_expansion 'function_prototype', '@prototype_template'
+      add_expansion 'function_parameters', '@parameters.collect { |p| ", VALUE #{p.name}" }.join'
+      add_expansion 'function_call', 'stub'
+      add_expansion 'function_varname', 'varname'
+      add_expansion 'function_cname', '@name'
+      add_expansion 'function_paramcount', '@variable ? "-1" : @parameters.size.to_s'
+      add_expansion 'function_bindname', '@bindname'
+      add_expansion 'parent_varname', '@parent.varname'
     end
 
     # Adds an alias for the function.
@@ -127,24 +141,6 @@ module Rust
     end
     private :params_conversion
     
-    def definition
-      @definition_template.
-        gsub("!function_prototype!", prototype).
-        gsub("!function_call!", stub).
-        gsub("!function_varname!", varname).
-        gsub("!function_cname!", @name)
-    end
-
-    def declaration
-      "#{prototype};"
-    end
-    
-    def prototype
-      @prototype_template.
-        gsub("!function_varname!", varname).
-        gsub("!function_parameters!", @parameters.collect { |p| ", VALUE #{p.name}" }.join)
-    end
-
     def raw_call(param = nil, params = nil)
       "#{@name}(#{params_conversion(param, params)})"
     end
@@ -175,27 +171,6 @@ module Rust
       calls << "  case #{@parameters.size}: #{bind_call(@parameters.size)}"
 
       return Templates["VariableFunctionCall"].gsub("!calls!", calls)
-    end
-    
-    def initialization
-      paramcount = 
-        case
-          # when @custom then @custom_paramcount
-          # when @template then @template_paramcount
-        when @variable then -1
-        else @parameters.size
-        end
-
-      ret = @initialization_template +
-        @aliases.collect { |alii|
-          Templates["FunctionInitAlias"].gsub("!function_alias!", alii)
-        }.join("\n")
-
-      ret.
-        gsub!("!parent_varname!", @parent.varname).
-        gsub!("!function_bindname!", @bindname).
-        gsub!("!function_varname!", @varname).
-        gsub!("!function_paramcount!", paramcount.to_s)
     end
 
   end
