@@ -78,6 +78,9 @@ module Rust
       
       header.puts bindings.header
       unit.puts bindings.unit
+
+      header.close
+      unit.close
     end
 
     # Adds an include header with the specified name.
