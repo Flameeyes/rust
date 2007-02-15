@@ -1,4 +1,4 @@
-TESTDIRS=cppclass_base languages
+TESTDIRS=cppclass_base languages cwrapper
 
 all: test
 
