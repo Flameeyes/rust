@@ -23,6 +23,7 @@
 require 'rust/element'
 require "rust/cxxclass"
 require "rust/cwrapper"
+require 'rust/constants'
 
 module Rust
 
@@ -84,6 +85,10 @@ module Rust
       @children << function
 
       return function
+    end
+
+    def add_constant(name, value = name)
+      @children << Constant.new(name, value, self)
     end
   end
 
