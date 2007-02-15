@@ -20,21 +20,33 @@
 # CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+require 'rust/element'
 require "rust/cxxclass"
 require "rust/cwrapper"
 
 module Rust
 
-  class Namespace
+  class Namespace < Element
     attr_reader :name, :cxxname, :varname
 
     def initialize(name, cxxname)
+      super()
+
       @name = name
       @cxxname = cxxname
       @varname = "#{@name.gsub("::", "_")}"
 
-      @classes = Array.new
-      @functions = [] 
+      @declaration_template = Templates["ModuleDeclarations"]
+      @definition_template = Templates["ModuleDefinitions"]
+      unless @name.include?("::")
+        @initialization_template = "r!namespace_varname! = rb_define_module(\"!module_name!\");\n"
+      else
+        # TODO this should use the expansion
+        @initialization_template = "r!namespace_varname! = rb_define_module_under(r#{@name.split("::")[0..-2].join("_")}, \"#{@name.split("::").last}\");\n"
+      end
+
+      add_expansion 'module_name', 'name'
+      add_expansion 'namespace_varname', 'varname'
     end
 
     def add_cxx_class(name, parent = nil)
@@ -42,7 +54,7 @@ module Rust
 
       yield klass
 
-      @classes << klass
+      @children << klass
       return klass
     end
 
@@ -51,7 +63,7 @@ module Rust
       
       yield klass
 
-      @classes << klass
+      @children << klass
       return klass
     end
 
@@ -69,44 +81,9 @@ module Rust
         # or other extra informations.
       end
 
-      @functions << function
+      @children << function
 
       return function
-    end
-
-    def declaration
-      ret = Templates["ModuleDeclarations"] +
-        @classes.collect { |klass| klass.declaration }.join("\n") +
-        @functions.collect { |funct| funct.declaration }.join("\n")
-
-      ret.
-        gsub("!module_name!", @name).
-        gsub("!namespace_varname!", varname)
-    end
-    
-    def definition
-      ret = Templates["ModuleDefinitions"] +
-        @classes.collect { |klass| klass.definition }.join("\n") +
-        @functions.collect { |funct| funct.definition }.join("\n")
-
-      ret.
-        gsub("!module_name!", @name).
-        gsub("!namespace_varname!", varname)
-    end
-    
-    def initialization
-      unless @name.include?("::")
-        ret = "r#{varname} = rb_define_module(\"#{@name}\");\n"
-      else
-        ret = "r#{varname} = rb_define_module_under(m#{@name.split("::")[0..-2].join("_")}, \"#{@name.split("::").last}\");\n"
-      end
-
-      ret << @classes.collect { |klass| klass.initialization }.join("\n")
-      ret << @functions.collect { |funct| funct.initialization }.join("\n")
-      
-      ret.
-        gsub("!module_name!", @name).
-        gsub("!namespace_varname!", varname)
     end
   end
 
