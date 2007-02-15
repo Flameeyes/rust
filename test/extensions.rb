@@ -33,6 +33,7 @@ class RustTest < Test::Unit::TestCase
     case language
     when 'c' then [ 'c', 'h', 'rb' ]
     when 'cc' then [ 'cc', 'hh', 'rb' ]
+    when 'rb' then [ 'rb' ]
     end.each do |ext|
       assert( File.exist?("#{extname}.#{ext}"),
               "Missing prerequisite #{extname}.#{ext} source file" )
@@ -47,7 +48,12 @@ class RustTest < Test::Unit::TestCase
     cxxflags = "#{ENV['CXXFLAGS']} -I#{Config::CONFIG["archdir"]} -I../include -DDEBUG -fPIC"
     ldflags = "#{ENV['LDFLAGS']} -Wl,-z,defs -shared"
 
-    cmdline = "#{cc} #{cxxflags} #{ldflags} #{extname}.#{language} #{extname}_rb.cc -o #{extname}_rb.so -lruby"
+    sourcefile = case language
+                 when 'c' then "#{extname}.c"
+                 when 'cc' then "#{extname}.cc"
+                 end
+
+    cmdline = "#{cc} #{cxxflags} #{ldflags} #{sourcefile} #{extname}_rb.cc -o #{extname}_rb.so -lruby"
     
     puts cmdline
     ret = system cmdline
@@ -59,12 +65,10 @@ class RustTest < Test::Unit::TestCase
   def teardown
     extname, language = name[5..-1].split('(')[0].split("_")
 
-    begin
-      File.unlink("#{extname}_rb.#{language}")
-      File.unlink("#{extname}_rb.#{language.gsub('c', 'h')}")
-      File.unlink("#{extname}_rb.so")
-    rescue Errno::ENOENT
+    [ "c", "cc", "h", "hh", "so" ].each do |extension|
+      File.unlink("#{extname}_rb.#{extension}") if File.exists?("#{extname}_rb.#{extension}")
     end
+
   end
 
   def test_cppclass_cc
@@ -101,5 +105,12 @@ class RustTest < Test::Unit::TestCase
 
     assert(@instance.set_string("ciao" * 70) == false, "The set_string function does not return true for invalid values")
     assert(@instance.get_string == "", "The set_string function does not ignore invalid values")
+  end
+
+  def test_constants_rb
+    assert(RustTestConstants::DummyClass::ClassConstant == 123,
+           "The class constant is not set properly.")
+    assert(RustTestConstants::ModuleConstant == "foobar",
+           "The module constant is not set properly.")
   end
 end
