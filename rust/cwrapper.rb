@@ -56,6 +56,12 @@ module Rust
         "tmp = #{super(nparam)}"
       end
     end
+
+    class Method < Class::Method
+      def add_instance_parameter
+        add_static_parameter 'tmp'
+      end
+    end
   end
 
 end
