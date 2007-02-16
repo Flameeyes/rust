@@ -32,11 +32,12 @@ module Rust
 
       @cname = type
       @varcname = @cname.sub("*", "Ptr").gsub("::", "_").gsub(' ', '')
+      @cleanup_functions = ""
 
       @definition_template = Templates["CWrapperClassDefinitions"]
       @declaration_template << Templates["StandaloneClassDeclarations"]
 
-      add_expansion 'cleanup_functions', "''"
+      add_expansion 'cleanup_functions', '@cleanup_functions'
     end
 
     def add_constructor(name)
@@ -45,6 +46,10 @@ module Rust
       constructor.name = name
 
       return constructor
+    end
+
+    def add_cleanup_function(call)
+      @cleanup_functions << call << "\n"
     end
 
     # This class is used to represente the constructor of a C++ class
