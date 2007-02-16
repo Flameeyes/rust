@@ -33,6 +33,10 @@ test_wrapper_t *cwrapper_alloc() {
   instance->integer = 1985;
   instance->string = malloc(256);
   instance->string[0] = '\0';
+
+  fprintf(stderr, "created: %p\n", instance);
+
+  return instance;
 }
 
 uint32_t cwrapper_get_integer(test_wrapper_t *instance) {
