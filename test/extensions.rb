@@ -101,7 +101,7 @@ class RustTest < Test::Unit::TestCase
 
   def test_cwrapper_c
     assert(RustTestCWrapper::TestConstant == 1985, "The test constant is not set properly.")
-    assert(RustTestCWrapper::get_default_integer, "The module function is not set properly.")
+    assert(RustTestCWrapper::get_default_integer == 1985, "The module function is not set properly.")
 
     @instance = RustTestCWrapper::TestClass.new
 
