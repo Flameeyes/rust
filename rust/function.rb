@@ -84,7 +84,7 @@ module Rust
     # the same function, or a function call to transform the value of
     # another parameter of the function.
     class StaticParameter < Parameter
-      attr_reader :default
+      attr_reader :value
 
       def initialize(value)
         @value = value
