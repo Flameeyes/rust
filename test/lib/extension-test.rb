@@ -23,6 +23,7 @@
 require 'test/unit'
 require 'rbconfig'
 require 'pathname'
+require 'tmpdir'
 
 $: << (Pathname.new(__FILE__).dirname + "../..").realpath
 
