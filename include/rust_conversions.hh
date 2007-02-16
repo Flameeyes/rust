@@ -27,8 +27,6 @@
 #include <stdint.h>
 #include <ruby.h>
 
-#include <string>
-
 /* Standard conversions for integer values */
 
 static inline uint32_t ruby2uint(VALUE rval) {
