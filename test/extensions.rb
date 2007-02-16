@@ -116,8 +116,8 @@ class RustTest < Test::Unit::TestCase
     assert(@instance.get_string == "ciao", "The set_string function does not work properly")
 
 
-    assert(@instance.set_string("ciao" * 70) == false, "The set_string function does not return true for invalid values")
-    assert(@instance.get_string == "", "The set_string function does not ignore invalid values")
+    assert(@instance.set_string("foobar" * 70) == false, "The set_string function does not return true for invalid values")
+    assert(@instance.get_string == "ciao", "The set_string function does not ignore invalid values")
 
     cleanup
   end
