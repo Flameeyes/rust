@@ -249,8 +249,6 @@ module Rust
           param.respond_to?("default") or
           param.respond_to?("value")
 
-        ret << "," if index > 0
-
         case
         when param.respond_to?("value")
           ret << param.value
@@ -263,9 +261,11 @@ module Rust
         when param.respond_to?("default")
           ret << param.default
         end
+
+        ret << ","
       end
 
-      return ret
+      return ret.chomp!(",")
     end
     private :params_conversion
     
