@@ -20,14 +20,14 @@
 # CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-require 'rust/element'
+require 'rust/container'
 require "rust/cxxclass"
 require "rust/cwrapper"
 require 'rust/constants'
 
 module Rust
 
-  class Namespace < Element
+  class Namespace < Container
     attr_reader :name, :cxxname, :varname
 
     def initialize(name, cxxname)
@@ -50,46 +50,6 @@ module Rust
       add_expansion 'namespace_varname', 'varname'
     end
 
-    def add_cxx_class(name, parent = nil)
-      klass = CxxClass.new(name, self, parent)
-
-      yield klass
-
-      @children << klass
-      return klass
-    end
-
-    def add_class_wrapper(name, type)
-      klass = ClassWrapper.new(name, type, self)
-      
-      yield klass
-
-      @children << klass
-      return klass
-    end
-
-    def add_function(name, return_value = "void", bindname = name)
-      function = Function.new({ :name => name,
-                                :bindname => bindname,
-                                :return => return_value,
-                                :parent => self
-                              })
-
-      begin
-        yield function
-      rescue LocalJumpError
-        # Ignore this, we can easily have methods without parameters
-        # or other extra informations.
-      end
-
-      @children << function
-
-      return function
-    end
-
-    def add_constant(name, value = name)
-      @children << Constant.new(name, value, self)
-    end
   end
 
 end

@@ -20,11 +20,11 @@
 # CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-require 'rust/element'
+require 'rust/container'
 require 'rust/function'
 
 module Rust
-  class Class < Element
+  class Class < Container
     attr_reader :name, :cname
     attr_reader :varname, :varcname, :ptrmap, :function_free, :parent_varname
 
