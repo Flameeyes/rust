@@ -23,6 +23,11 @@
 
 #include <stdint.h>
 
+struct test_wrapper_s {
+  uint32_t integer;
+  char *string;
+};
+
 typedef struct test_wrapper_s test_wrapper_t;
 
 #define TEST_CONSTANT 1985

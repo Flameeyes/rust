@@ -24,17 +24,13 @@
 #include "cwrapper.h"
 
 #include <stdlib.h>
-
-struct {
-  uint32_t integer;
-  char *string;
-} test_wrapper_s;
+#include <string.h>
 
 test_wrapper_t *cwrapper_alloc() {
-  test_wrapper_t *instance = malloc(sizeof(test_wrapper_s));
+  test_wrapper_t *instance = (test_wrapper_t *)malloc(sizeof(test_wrapper_s));
 
   instance->integer = 1985;
-  instance->string = malloc(256);
+  instance->string = (char*)malloc(256);
   instance->string[0] = '\0';
 }
 
@@ -43,7 +39,7 @@ uint32_t cwrapper_get_integer(test_wrapper_t *instance) {
 }
 
 const char *cwrapper_get_string(test_wrapper_t *instance) {
-  return instance->integer;
+  return instance->string;
 }
 
 int cwrapper_set_string(test_wrapper_t *instance, const char *string) {
