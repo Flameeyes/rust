@@ -20,7 +20,7 @@
 # CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-require '../rust'
+require 'rust'
 
 Rust::Bindings::create_bindings Rust::Bindings::LangCxx, "cppclass_rb" do |b|
   b.include_header 'cppclass.hh', Rust::Bindings::HeaderLocal
