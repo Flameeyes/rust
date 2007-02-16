@@ -27,10 +27,10 @@
 #include <string.h>
 
 test_wrapper_t *cwrapper_alloc() {
-  test_wrapper_t *instance = (test_wrapper_t *)malloc(sizeof(test_wrapper_s));
+  test_wrapper_t *instance = malloc(sizeof(struct test_wrapper_s));
 
   instance->integer = 1985;
-  instance->string = (char*)malloc(256);
+  instance->string = malloc(256);
   instance->string[0] = '\0';
 }
 
