@@ -31,23 +31,63 @@ module Rust
     # Class representing a function or method parameter
     class Parameter
 
-      attr_reader :type, :name, :optional, :default
+      attr_reader :type, :name, :optional
 
-      def initialize(type, name, optional, default) #:notnew:
+      def initialize(type, name, optional) #:notnew:
         @type = type
         @name = name
         @optional = optional
-        @default = default
       end
 
-      # Returns the string of the parameter conversion from ruby to
-      # C++.
-      #
-      # The index parameter 
-      def conversion(index = nil)
-        paramname = index ? "argv[#{index}]" : @name
+      # Returns the C/C++ call to convert the (named) parameter from its
+      # ruby value to the C/C++ corresponding variable
+      def conversion
+        return internal_conversion(@name)
+      end
 
-        "ruby2#{@type.sub("*", "Ptr").gsub("::", "_").gsub(' ', '')}(#{paramname}),"
+      # Returns the C/C++ call to convert the (indexed) parameter from
+      # its ruby value to the C/C++ corresponding variable, for
+      # variable-argument function calls.
+      def index_conversion(index)
+        raise TypeError, "index not an integer" if index.class != Fixnum
+        return internal_conversion("argv[#{index}]")
+      end
+
+      # Internal conversion funciton used by Parameter.conversion
+      # and Parameter.index_conversion public functions.
+      def internal_conversion(variable)
+        "ruby2#{@type.sub("*", "Ptr").gsub("::", "_").gsub(' ', '')}(#{variable})"
+      end
+      private :internal_conversion
+
+    end
+
+    # This class describes a parameter with a default value: this
+    # creates a variable-argument function, where this parameter can
+    # be skipped. If missing, the default value will be used.
+    class DefaultParameter < Parameter
+      attr_reader :default
+
+      def initialize(type, name, value)
+        super(type, name, false)
+        
+        @default = value
+      end
+    end
+
+    # This class describe a parameter that is given a constant value:
+    # such a parameter won't be available on the Ruby side of the
+    # interface, instead it will be replaced during call with a
+    # constant value. Note that the constant might as well be the
+    # value of a variable available in the scope of the function call
+    # (i.e. the instance pointer (tmp) or the name of another parameter).
+    class ConstantParameter < Parameter
+      attr_reader :default
+
+      def initialize(type, name, value)
+        super(type, name, false)
+
+        @value = value
       end
     end
 
@@ -86,7 +126,7 @@ module Rust
       add_expansion 'function_call', 'stub'
       add_expansion 'function_varname', 'varname'
       add_expansion 'function_cname', '@name'
-      add_expansion 'function_paramcount', '@variable ? "-1" : @parameters.size.to_s'
+      add_expansion 'function_paramcount', 'paramcount'
       add_expansion 'function_bindname', '@bindname'
       add_expansion 'parent_varname', '@parent.varname'
     end
@@ -106,14 +146,36 @@ module Rust
     end
 
     # Adds a new parameter to the function
-    def add_parameter(name, type, optional = false, default = nil)
-      param = Parameter.new(name, type, optional, default)
+    def add_parameter(name, type, optional = false)
+      param = Parameter.new(name, type, optional)
       @parameters << param
 
-      if optional or default != nil
+      if optional
         @variable = true 
         @prototype_template = "VALUE !function_varname! ( int argc, VALUE *argv, VALUE self )"
       end
+
+      return param
+    end
+
+    # Adds a parameter with a default value.
+    # See Rust::Function::DefaultParameter
+    def add_parameter_default(name, type, value)
+      @variable = true
+      @prototype_template = "VALUE !function_varname! ( int argc, VALUE *argv, VALUE self )"
+
+      param = DefaultParameter.new(name, type, value)
+
+      @parameters << param
+
+      return param
+    end
+
+    # Adds a constant parameter, see Rust::Function::ConstantParameter
+    def add_constant_parameter(name, type, value)
+      param = ConstantParameter.new(name, type, value)
+
+      @parameters << param
 
       return param
     end
@@ -126,18 +188,54 @@ module Rust
       @prototype_template = prototype
     end
 
-    def params_conversion(nparms = nil, params = nil)
+    # Gets the parameters' count. For variable-arguments functions,
+    # this returns -1, while for other functions the count depends on
+    # the parameters added, as there might be parameters which are
+    # passed constant values (e.g. the instance parameter for class
+    # wrappers), that are not counted for Ruby-side parameters count.
+    def paramcount
+      return -1 if @variable
+
+      paramcount = 0
+      @parameters.each do |param|
+        paramcount = paramcount +1 unless param.respond_to?("value")
+      end
+
+      return paramcount
+    end
+
+    def params_conversion(nparams = nil, params = nil)
       return if @parameters.empty?
-      vararg = nparms != nil
-      nparms = @parameters.size unless nparms
+
+      nparams = @parameters.size unless nparams
       
       ret = ""
-      @parameters.slice(0, nparms).each_index { |p|
-        ret << @parameters[p].conversion( vararg ? p : nil )
-      }
-      ret << "#{params[0]}," if params
-      
-      ret.chomp!(",")
+      index = 0
+      @parameters.each do |param|
+        # If we're done with the parameters requested, then we're in
+        # the extra loops, which means we break out unless the current
+        # parameter is a default parameter or a constant parameter.
+        break unless index < nparams or
+          param.respond_to?("default") or
+          param.respond_to?("value")
+
+        ret << "," if index > 0
+
+        case
+        when (index < nparams and nparams == @parameters.size)
+          ret << param.conversion
+        when (index < nparams and nparams != @parameters.size)
+          ret << param.index_conversion(index)
+        when param.respond_to?("default")
+          ret << param.default
+        when param.respond_to?("value")
+          ret << param.value
+        end
+
+        index = index +1
+      end
+
+      return ret
     end
     private :params_conversion
     
