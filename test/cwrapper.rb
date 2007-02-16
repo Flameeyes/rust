@@ -46,9 +46,7 @@ Rust::Bindings::create_bindings Rust::Bindings::LangC, "cwrapper_rb" do |b|
         method.add_parameter "uint32_t", "integer"
       end
 
-      klass.add_cleanup_function 'cwrapper_free' do |method|
-        method.add_instance_parameter
-      end
+      klass.add_cleanup_function 'cwrapper_free((test_wrapper_t*)p);'
     end
 
     ns.add_function 'cwrapper_get_default_integer', 'get_default_integer'
