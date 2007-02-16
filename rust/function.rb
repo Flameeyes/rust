@@ -204,10 +204,29 @@ module Rust
       return paramcount
     end
 
-    def params_conversion(nparams = nil, params = nil)
+    # Returns an array of the valid cases for variable-argument calls.
+    # For instance, a function might need _at least_ three parameters,
+    # and can accept _up to_ nine parameters. In that case the range
+    # would be 3..9.
+    # The upper boundary is always the same of paramcount, while the
+    # lower depends on the first optional parameter found. Parameters
+    # with default are like optional parameters.
+    def arguments_range
+      lower_bound = 0
+      @parameters.each do |param|
+        break if (param.respond_to?("default") or param.optional)
+
+        lower_bound = lower_bound +1
+      end
+
+      return lower_bound..paramcount
+    end
+
+    def params_conversion(nparams = nil)
       return if @parameters.empty?
 
-      nparams = @parameters.size unless nparams
+      variable_arguments = nparams != nil
+      nparams = paramcount unless nparams
       
       ret = ""
       index = 0
@@ -222,10 +241,12 @@ module Rust
         ret << "," if index > 0
 
         case
-        when (index < nparams and nparams == @parameters.size)
+        when (index < nparams and not variable_arguments)
           ret << param.conversion
-        when (index < nparams and nparams != @parameters.size)
+          index = index +1 # Only increment for ruby parameters consumed
+        when (index < nparams and variable_arguments)
           ret << param.index_conversion(index)
+          index = index +1 # Only increment for ruby parameters consumed
         when param.respond_to?("default")
           ret << param.default
         when param.respond_to?("value")
@@ -239,19 +260,19 @@ module Rust
     end
     private :params_conversion
     
-    def raw_call(param = nil, params = nil)
-      "#{@name}(#{params_conversion(param, params)})"
+    def raw_call(nparam = nil)
+      "#{@name}(#{params_conversion(nparam)})"
     end
     private :raw_call
     
-    def bind_call(param = nil, params = nil)
+    def bind_call(nparam = nil)
       case @return
       when nil
         raise "nil return value is not supported for non-constructors."
       when "void"
-        return "#{raw_call(param, params)}; return Qnil;\n"
+        return "#{raw_call(nparam)}; return Qnil;\n"
       else
-        return "return cxx2ruby((#{@return})#{raw_call(param, params)});\n"
+        return "return cxx2ruby((#{@return})#{raw_call(nparam)});\n"
       end
     end
     private :bind_call
@@ -260,13 +281,9 @@ module Rust
       return bind_call unless @variable
       calls = ""
 
-      for n in 0..(@parameters.size-1)
-        calls << "  case #{n}: #{bind_call(n)}" if @parameters[n].optional
-        calls << "  case #{n}: #{bind_call(n, [@parameters[n].default])}" if
-          @parameters[n].default
+      for n in arguments_range
+        calls << "  case #{n}: #{bind_call(n)}"
       end
-
-      calls << "  case #{@parameters.size}: #{bind_call(@parameters.size)}"
 
       return Templates["VariableFunctionCall"].gsub("!calls!", calls)
     end

@@ -52,8 +52,8 @@ module Rust
     class Constructor < Class::Constructor
       attr_writer :name
 
-      def raw_call(param = nil, params = nil)
-        "tmp = #{super(param, params)}"
+      def raw_call(nparam = nil)
+        "tmp = #{super(nparam)}"
       end
     end
   end

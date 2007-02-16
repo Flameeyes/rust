@@ -118,8 +118,8 @@ module Rust
         @definition_template = Templates["ConstructorStub"]
       end
 
-      def bind_call(param = nil, params = nil)
-        "#{raw_call(param, params)};\n"
+      def bind_call(nparam = nil)
+        "#{raw_call(nparam)};\n"
       end
     end
 

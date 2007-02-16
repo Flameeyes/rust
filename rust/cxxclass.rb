@@ -97,14 +97,14 @@ module Rust
     end
 
     class Method < Class::Method
-      def raw_call(param = nil, params = nil)
-        "tmp->#{super(param, params)}"
+      def raw_call(nparam = nil)
+        "tmp->#{super(nparam)}"
       end
     end
 
     class Constructor < Class::Constructor
-      def raw_call(param = nil, params = nil)
-        "tmp = new #{super(param, params)}"
+      def raw_call(nparam = nil)
+        "tmp = new #{super(nparam)}"
       end
     end
 
