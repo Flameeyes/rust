@@ -83,6 +83,31 @@ module Rust
       return constructor
     end
 
+    # Adds a new method for the class.
+    # This function adds a new generic method for the class. In the
+    # case of C++ classes, this is an actual method of the bound
+    # class, while in case of Class Wrappers, this is just a function
+    # that expects to find a static parameter that is the instance
+    # pointer itself.
+    def add_method(name, return_value = "void", bindname = name)
+      method = self.class::Method.new({ :name => name,
+                            :bindname => bindname,
+                            :return => return_value,
+                            :klass => self
+                          })
+
+      begin
+        yield method
+      rescue LocalJumpError
+        # Ignore this, we can easily have methods without parameters
+        # or other extra informations.
+      end
+
+      @children << method
+
+      return method
+    end
+
     # This class is used to represent a method for a C/C++ class bound
     # in a Ruby extension. Through an object of this class you can add
     # parameters and more to the method.

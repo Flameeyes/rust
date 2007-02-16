@@ -57,25 +57,6 @@ module Rust
       add_expansion 'test_children'
     end
 
-    def add_method(name, return_value = "void", bindname = name)
-      method = Method.new({ :name => name,
-                            :bindname => bindname,
-                            :return => return_value,
-                            :klass => self
-                          })
-
-      begin
-        yield method
-      rescue LocalJumpError
-        # Ignore this, we can easily have methods without parameters
-        # or other extra informations.
-      end
-
-      @children << method
-
-      return method
-    end
-
     # This function is used during ruby to C/C++ conversion of the
     # types, and test for the deepest class the pointer is valid for.
     def test_children
