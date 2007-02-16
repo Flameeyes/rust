@@ -44,7 +44,12 @@ module Rust
 
     def expand(str)
       @expansions.each do |key, expression|
-        str.gsub!("!#{key}!", eval(expression))
+        begin
+          str.gsub!("!#{key}!", eval(expression))
+        rescue
+          $stderr.puts "Exception during substitution of '#{key}' into '#{expression}' for #{self.inspect}"
+          raise
+        end
       end
 
       return str
