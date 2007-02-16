@@ -22,80 +22,75 @@
 
 require 'test/unit'
 require 'rbconfig'
+require 'pathname'
 
-$: << File.dirname(__FILE__) + "/../.."
+$: << (Pathname.new(__FILE__).dirname + "../..").realpath
 
 module Rust
 
 # The Rust::Test module contains the classes used for Rust regression
 # testing, both the generic ones, and the actual test ones.
 module Test
-
   # This module is de-facto a subclass of Test::Unit::TestCase, but
   # because of the way the tests work, so we can't just derive from
   # that, and instead we use mixins.
   module ExtensionTest
 
-    @@setup_already = false
-
     def extension_setup(extname, language)
-      @extname = extname
-      return if @@setup_already
+      raise UnnamedExtension unless extname
 
-      raise UnnamedExtension unless @extname
+      tempdir = Pathname.new(Dir::tmpdir) + "rust-test.#{$$}/#{extname}"
+      tempdir.mkpath
 
-      @@setup_already = true
+      return if File.exist?("#{tempdir}/#{extname}_rb.so")
 
-      puts "Building extension #{@extname} (#{language})"
+      assert( (!File.exist?("#{tempdir}/#{extname}_rb.cc") and !File.exist?("#{tempdir}/#{extname}_rb.hh")),
+              "There are already generated files." )
+
+      puts "Building extension #{extname} (#{language})"
 
       case language
       when 'c' then [ 'c', 'h', 'rb' ]
       when 'cc' then [ 'cc', 'hh', 'rb' ]
       when 'rb' then [ 'rb' ]
       end.each do |ext|
-        assert( File.exist?("#{@extname}.#{ext}"),
-                "Missing prerequisite #{@extname}.#{ext} source file" )
+        assert( File.exist?("#{extname}.#{ext}"),
+                "Missing prerequisite #{extname}.#{ext} source file" )
       end
 
-      load "./#{@extname}.rb"
+      sourcedir = Dir.pwd
+      Dir.chdir(tempdir) do
+        load "#{sourcedir}/#{extname}.rb"
+      end
 
-      assert( (File.exists?("#{@extname}_rb.cc") && File.exist?("#{@extname}_rb.hh")),
+      assert( (File.exists?("#{tempdir}/#{extname}_rb.cc") && File.exist?("#{tempdir}/#{extname}_rb.hh")),
               "The extension's source files weren't generated.")
 
       cxx = ENV['CXX'] ? ENV['CXX'] : 'c++'
       cc =  ENV['CC'] ? ENV['CC'] : 'cc'
-      cxxflags = "#{ENV['CXXFLAGS']} -I#{Config::CONFIG["archdir"]} -I../include -DDEBUG -fPIC"
-      cflags = "#{ENV['CFLAGS']} -DDEBUG -fPIC"
+      cxxflags = "#{ENV['CXXFLAGS']} -I#{Config::CONFIG["archdir"]} -I. -I../include -DDEBUG -fPIC"
+      cflags = "#{ENV['CFLAGS']} -I. -DDEBUG -fPIC"
       ldflags = "#{ENV['LDFLAGS']} -Wl,-z,defs -shared"
 
       cmdlines = []
       case language
       when 'cc'
-        sourcefile = "#{@extname}.cc"
+        sourcefile = "#{extname}.cc"
       when 'c'
-        sourcefile = "#{@extname}.o"
-        cmdlines << "#{cc} #{cflags} #{@extname}.c -c -o #{@extname}.o"
+        sourcefile = "#{tempdir}/#{extname}.o"
+        cmdlines << "#{cc} #{cflags} #{extname}.c -c -o #{tempdir}/#{extname}.o"
       end
 
-      cmdlines << "#{cxx} #{cxxflags} #{ldflags} #{sourcefile} #{@extname}_rb.cc -o #{@extname}_rb.so -lruby"
+      cmdlines << "#{cxx} #{cxxflags} #{ldflags} #{sourcefile} #{tempdir}/#{extname}_rb.cc -o #{tempdir}/#{extname}_rb.so -lruby"
 
       cmdlines.each do |cmd|
         puts cmd
         ret = system cmd
-        assert ret, "Building of extension #{@extname} failed."
+        assert ret, "Building of extension #{extname} failed."
       end
 
-      require "./#{@extname}_rb.so"
+      require "#{tempdir}/#{extname}_rb.so"
     end
-
-    def cleanup
-      [ "c", "cc", "h", "hh", "so" ].each do |extension|
-        File.unlink("#{@extname}_rb.#{extension}") if File.exists?("#{@extname}_rb.#{extension}")
-      end
-
-      File.unlink("#{@extname}.o") if File.exists?("#{extname}.o")
-    end
-
   end
 
 end
