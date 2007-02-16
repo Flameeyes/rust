@@ -40,17 +40,17 @@ test_wrapper_t *cwrapper_alloc() {
 }
 
 uint32_t cwrapper_get_integer(test_wrapper_t *instance) {
-  fprintf(stderr, "instance: %p\n");
+  fprintf(stderr, "instance: %p\n", instance);
   return instance->integer;
 }
 
 const char *cwrapper_get_string(test_wrapper_t *instance) {
-  fprintf(stderr, "instance: %p\n");
+  fprintf(stderr, "instance: %p\n", instance);
   return instance->string;
 }
 
 int cwrapper_set_string(test_wrapper_t *instance, const char *string) {
-  fprintf(stderr, "instance: %p\n");
+  fprintf(stderr, "instance: %p\n", instance);
   if (strlen(string) > 255) return 0;
 
   strncpy(instance->string, string, 255);
@@ -59,7 +59,7 @@ int cwrapper_set_string(test_wrapper_t *instance, const char *string) {
 }
 
 void cwrapper_set_integer(test_wrapper_t *instance, uint32_t integer) {
-  fprintf(stderr, "instance: %p\n");
+  fprintf(stderr, "instance: %p\n", instance);
   instance->integer = integer;
 }
 
@@ -68,7 +68,7 @@ uint32_t cwrapper_get_default_integer() {
 }
 
 void cwrapper_free(test_wrapper_t *instance) {
-  fprintf(stderr, "instance: %p\n");
+  fprintf(stderr, "instance: %p\n", instance);
   free(instance->string);
   free(instance);
 }
