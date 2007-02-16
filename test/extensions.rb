@@ -103,7 +103,7 @@ class RustTest < Test::Unit::TestCase
     assert(RustTestCWrapper::TestConstant == 1985, "The test constant is not set properly.")
     assert(RustTestCWrapper::get_default_integer, "The module function is not set properly.")
 
-    @instance = RustTestCWrapper::TestWrapper.new
+    @instance = RustTestCWrapper::TestClass.new
 
     assert(@instance.get_integer == RustTestCWrapper::get_default_integer, "The get_integer function does not work properly")
 
