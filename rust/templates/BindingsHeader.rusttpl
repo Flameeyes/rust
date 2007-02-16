@@ -17,4 +17,8 @@ extern "C" {
 /* This is for the ptrMap */
 #include <map>
 
+namespace Rust_!bindings_name! {
+
 !modules_declaration!
+
+}

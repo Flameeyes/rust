@@ -9,14 +9,25 @@
 // the extension. Unfortunately GCC's libstdc++ does not correctly
 // hide all of its symbols yet.
 
-#include <rust_conversions.hh>
+// This is needed here because I need to put the rust_conversions.hh
+// include inside these bindings' namespace.
+#include <string>
+
 #include "!bindings_name!.hh"
 
 #ifdef DEBUG
 #include <stdio.h> /* Used for fprintf */
 #endif
 
+namespace Rust_!bindings_name! {
+
+#include <rust_conversions.hh>
+
 !modules_definition!
+
+}
+
+using namespace Rust_!bindings_name!;
 
 extern "C" {
 
