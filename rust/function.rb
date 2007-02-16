@@ -252,6 +252,8 @@ module Rust
         ret << "," if index > 0
 
         case
+        when param.respond_to?("value")
+          ret << param.value
         when (index < nparams and not variable_arguments)
           ret << param.conversion
           index = index +1 # Only increment for ruby parameters consumed
@@ -260,8 +262,6 @@ module Rust
           index = index +1 # Only increment for ruby parameters consumed
         when param.respond_to?("default")
           ret << param.default
-        when param.respond_to?("value")
-          ret << param.value
         end
 
         index = index +1
