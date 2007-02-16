@@ -81,13 +81,12 @@ module Rust
     # static value, that can be a constant value or the name of a
     # variable that is visible in the scope of the function call, like
     # the tmp variable (the instance pointer) or another parameter of
-    # the same function.
+    # the same function, or a function call to transform the value of
+    # another parameter of the function.
     class StaticParameter < Parameter
       attr_reader :default
 
-      def initialize(type, name, value)
-        super(type, name, false)
-
+      def initialize(value)
         @value = value
       end
     end
@@ -107,9 +106,9 @@ module Rust
       @varname = "f#{@name}"
 
       @aliases = Set.new
-      @parameters = Array.new
       @variable = false # Variable arguments function
 
+      @parameters = Array.new
       nocamel_bindname = @bindname.gsub(/([^A-Z])([A-Z])([^A-Z])/) do
         |letter| "#{$1}_#{$2.downcase}#{$3}"
       end
@@ -123,7 +122,7 @@ module Rust
 
       add_expansion 'function_aliases', '@aliases.collect { |alii| Templates["FunctionInitAlias"].gsub("!function_alias!", alii) }.join("\n")'
       add_expansion 'function_prototype', '@prototype_template'
-      add_expansion 'function_parameters', '@parameters.collect { |p| ", VALUE #{p.name}" }.join'
+      add_expansion 'function_parameters', 'ruby_parameters'
       add_expansion 'function_call', 'stub'
       add_expansion 'function_varname', 'varname'
       add_expansion 'function_cname', '@name'
@@ -173,8 +172,8 @@ module Rust
     end
 
     # Adds a constant parameter, see Rust::Function::StaticParameter
-    def add_static_parameter(name, type, value)
-      param = StaticParameter.new(name, type, value)
+    def add_static_parameter(value)
+      param = StaticParameter.new(value)
 
       @parameters << param
 
@@ -203,6 +202,15 @@ module Rust
       end
 
       return paramcount
+    end
+
+    # Provides a string with the parameters that are actually 
+    def ruby_parameters
+      @parameters.collect do |param|
+        next if param.respond_to?("value")
+
+        ", VALUE #{param.name}"
+      end.join
     end
 
     # Returns an array of the valid cases for variable-argument calls.
