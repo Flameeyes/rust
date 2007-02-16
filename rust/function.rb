@@ -89,6 +89,8 @@ module Rust
       def initialize(value)
         @value = value
       end
+
+      private :conversion, :index_conversion, :name, :type
     end
 
     attr_reader :varname
