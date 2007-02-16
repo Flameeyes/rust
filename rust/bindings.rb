@@ -73,8 +73,8 @@ module Rust
 
       yield bindings
 
-      header = File.new("#{name}.hh", "w")
-      unit = File.new("#{name}.cc", "w")
+      header = File.new("#{name}.hh", File::CREAT|File::TRUNC|File::RDWR)
+      unit = File.new("#{name}.cc", File::CREAT|File::TRUNC|File::RDWR)
       
       header.puts bindings.header
       unit.puts bindings.unit
