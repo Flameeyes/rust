@@ -75,13 +75,14 @@ module Rust
       end
     end
 
-    # This class describe a parameter that is given a constant value:
+    # This class describe a parameter that is given a static value:
     # such a parameter won't be available on the Ruby side of the
     # interface, instead it will be replaced during call with a
-    # constant value. Note that the constant might as well be the
-    # value of a variable available in the scope of the function call
-    # (i.e. the instance pointer (tmp) or the name of another parameter).
-    class ConstantParameter < Parameter
+    # static value, that can be a constant value or the name of a
+    # variable that is visible in the scope of the function call, like
+    # the tmp variable (the instance pointer) or another parameter of
+    # the same function.
+    class StaticParameter < Parameter
       attr_reader :default
 
       def initialize(type, name, value)
@@ -171,9 +172,9 @@ module Rust
       return param
     end
 
-    # Adds a constant parameter, see Rust::Function::ConstantParameter
-    def add_constant_parameter(name, type, value)
-      param = ConstantParameter.new(name, type, value)
+    # Adds a constant parameter, see Rust::Function::StaticParameter
+    def add_static_parameter(name, type, value)
+      param = StaticParameter.new(name, type, value)
 
       @parameters << param
 
