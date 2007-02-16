@@ -263,8 +263,6 @@ module Rust
         when param.respond_to?("default")
           ret << param.default
         end
-
-        index = index +1
       end
 
       return ret
