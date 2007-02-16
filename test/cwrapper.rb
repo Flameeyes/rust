@@ -29,19 +29,19 @@ Rust::Bindings::create_bindings Rust::Bindings::LangC, "cwrapper_rb" do |b|
     ns.add_class_wrapper 'TestClass', 'test_wrapper_t' do |klass|
       klass.add_constructor 'cwrapper_alloc'
 
-      klass.add_method 'get_integer', 'uint32_t', 'cwrapper_get_integer' do |method|
+      klass.add_method 'cwrapper_get_integer', 'uint32_t', 'get_integer' do |method|
         method.add_instance_parameter
       end
-      klass.add_method 'get_string', 'char*', 'cwrapper_get_string' do |method|
+      klass.add_method 'cwrapper_get_string', 'char*', 'get_string' do |method|
         method.add_instance_parameter
       end
 
-      klass.add_method 'set_string', 'bool', 'cwrapper_set_string' do |method|
+      klass.add_method 'cwrapper_set_string', 'bool', 'set_string' do |method|
         method.add_instance_parameter
         method.add_parameter "char *", "string"
       end
 
-      klass.add_method 'set_integer', 'void', 'cwrapper_set_integer' do |method|
+      klass.add_method 'cwrapper_set_integer', 'void', 'set_integer' do |method|
         method.add_instance_parameter
         method.add_parameter "uint32_t", "integer"
       end
