@@ -46,20 +46,28 @@ class RustTest < Test::Unit::TestCase
     assert( (File.exists?("#{extname}_rb.cc") && File.exist?("#{extname}_rb.hh")),
             "The extension's source files weren't generated.")
 
-    cc = ENV['CXX'] ? ENV['CXX'] : 'c++'
+    cxx = ENV['CXX'] ? ENV['CXX'] : 'c++'
+    cc =  ENV['CC'] ? ENV['CC'] : 'cc'
     cxxflags = "#{ENV['CXXFLAGS']} -I#{Config::CONFIG["archdir"]} -I../include -DDEBUG -fPIC"
+    cflags = "#{ENV['CFLAGS']} -DDEBUG -fPIC"
     ldflags = "#{ENV['LDFLAGS']} -Wl,-z,defs -shared"
 
-    sourcefile = case language
-                 when 'c' then "#{extname}.c"
-                 when 'cc' then "#{extname}.cc"
-                 end
+    cmdlines = []
+    case language
+    when 'cc'
+      sourcefile = "#{extname}.cc"
+    when 'c'
+      sourcefile = "#{extname}.o"
+      cmdlines << "#{cc} #{cflags} #{extname}.c -c -o #{extname}.o"
+    end
 
-    cmdline = "#{cc} #{cxxflags} #{ldflags} #{sourcefile} #{extname}_rb.cc -o #{extname}_rb.so -lruby"
-    
-    puts cmdline
-    ret = system cmdline
-    assert ret, "Building of extension #{extname} failed."
+    cmdlines << "#{cxx} #{cxxflags} #{ldflags} #{sourcefile} #{extname}_rb.cc -o #{extname}_rb.so -lruby"
+
+    cmdlines.each do |cmd|
+      puts cmd
+      ret = system cmd
+      assert ret, "Building of extension #{extname} failed."
+    end
 
     require "./#{extname}_rb.so"
   end
@@ -71,6 +79,7 @@ class RustTest < Test::Unit::TestCase
       File.unlink("#{extname}_rb.#{extension}") if File.exists?("#{extname}_rb.#{extension}")
     end
 
+    File.unlink("#{extname}.o") if File.exists?("#{extname}.o")
   end
 
   def test_cppclass_cc
