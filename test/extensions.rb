@@ -27,6 +27,8 @@ $: << ".."
 
 class RustTest < Test::Unit::TestCase
   def setup
+    cleanup
+
     extname, language = name[5..-1].split('(')[0].split("_")
     puts "Building extension #{extname} (#{language})"
 
@@ -62,7 +64,7 @@ class RustTest < Test::Unit::TestCase
     require "./#{extname}_rb.so"
   end
 
-  def teardown
+  def cleanup
     extname, language = name[5..-1].split('(')[0].split("_")
 
     [ "c", "cc", "h", "hh", "so" ].each do |extension|
@@ -84,6 +86,8 @@ class RustTest < Test::Unit::TestCase
             "The converted CamelCase to ruby_convention is missing." )
     assert( RustTestCppClass::TestClass.instance_method("integer_value") == RustTestCppClass::TestClass.instance_method("integerValue"),
             "The converted CamelCase to ruby_conversion is not an alias of the original method" )
+
+    cleanup
   end
 
   def test_cwrapper_c
@@ -105,6 +109,8 @@ class RustTest < Test::Unit::TestCase
 
     assert(@instance.set_string("ciao" * 70) == false, "The set_string function does not return true for invalid values")
     assert(@instance.get_string == "", "The set_string function does not ignore invalid values")
+
+    cleanup
   end
 
   def test_constants_rb
@@ -112,5 +118,7 @@ class RustTest < Test::Unit::TestCase
            "The class constant is not set properly.")
     assert(RustTestConstants::ModuleConstant == "foobar",
            "The module constant is not set properly.")
+    
+    cleanup
   end
 end
