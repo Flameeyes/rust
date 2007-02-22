@@ -40,6 +40,8 @@ Rust::Bindings::create_bindings Rust::Bindings::LangCxx, "cppclass_rb" do |b|
 
       klass.add_method "integerValue", "uint32_t"
       klass.add_method "stringValue", "std::string"
+
+      klass.add_variable "variable", "uint32_t"
     end
   end
 end

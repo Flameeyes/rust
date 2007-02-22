@@ -50,6 +50,15 @@ module Rust::Test
               "The converted CamelCase to ruby_conversion is not an alias of the original method" )
 
     end
+
+    def test_variable
+      random_value = rand(655360)
+      
+      @instance.variable = random_value
+
+      assert( @instance.variable == random_value,
+               "The set/get of variable doe snot work." )
+    end
   end
 
 end

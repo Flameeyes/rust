@@ -40,7 +40,17 @@ public:
     return val;
   }
 
+  uint32_t variable() {
+    return m_variable;
+  }
+
+  uint32_t setVariable(uint32_t value) {
+    m_variable = value;
+  }
+
 protected:
   uint32_t val;
   std::string str;
+
+  uint32_t m_variable;
 };
