@@ -42,6 +42,18 @@ Rust::Bindings::create_bindings Rust::Bindings::LangCxx, "cppclass_rb" do |b|
       klass.add_method "stringValue", "std::string"
 
       klass.add_variable "variable", "uint32_t"
+
+      klass.add_enum "Test" do |enum|
+        enum.add_value 'Foo1'
+        enum.add_value 'Foo2'
+        enum.add_value 'Foo3'
+        enum.add_value 'Foo4'
+        enum.add_value 'Foo6'
+      end
+
+      klass.add_method "testEnum" do |method|
+        method.add_parameter "TestClass::Test", "param"
+      end
     end
   end
 end

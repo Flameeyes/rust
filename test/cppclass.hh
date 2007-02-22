@@ -48,6 +48,13 @@ public:
     m_variable = value;
   }
 
+  enum Test {
+    Foo1, Foo2, Foo3, Foo4, Foo6 = 6
+  };
+
+  void testEnum(Test param) {
+  }
+
 protected:
   uint32_t val;
   std::string str;
