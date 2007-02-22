@@ -108,6 +108,36 @@ module Rust
       return method
     end
 
+    # Adds a new variable for the class. It's not an actual variable,
+    # as hopefully there aren't global or class public variables in
+    # any library.
+    # These virtual variables have setter and getter methods, usually
+    # called 'var' and 'setVar' in C++ (or 'getVar' and 'setVar'), and
+    # are mapped to 'var' and 'var=' in Ruby, so that setting the
+    # variable in Ruby will just call the setter method.
+    def add_variable(name, type, getter = nil, setter = nil)
+      getter = name unless getter
+      setter = "set" + name[0..0].capitalize + name[1..-1] unless
+        setter
+
+      method_get = add_method getter, type
+      method_get.add_alias name
+
+      method_set = add_method setter, "void"
+      method_set.add_alias "#{name}="
+
+      begin
+        yield method_get, method_set
+      rescue LocalJumpError
+        # Ignore this, we can easily have methods without parameters
+        # or other extra informations.
+      end
+
+      method_set.add_parameter type, "value"
+
+      return [method_get, method_set]
+    end
+
     # This class is used to represent a method for a C/C++ class bound
     # in a Ruby extension. Through an object of this class you can add
     # parameters and more to the method.
