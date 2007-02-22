@@ -1,0 +1,13 @@
+//-*-c++-*-
+
+!enum_cname! ruby2!enum_varname!(VALUE rval) {
+  int cval = ruby2int(rval);
+
+  switch(cval) {
+    !enum_cases!
+      return static_cast<!enum_cname!>(cval);
+    default:
+      rb_raise(rb_eArgError, "value %d for enum !enum_name! is out of bound", cval);
+      return static_cast<!enum_cname!>(-1);
+  }
+}

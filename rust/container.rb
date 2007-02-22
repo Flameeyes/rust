@@ -21,6 +21,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 require 'rust/element'
+require 'rust/enum'
 
 module Rust
   # This class defines a 'container', an element that can contain
@@ -67,6 +68,16 @@ module Rust
 
     def add_constant(name, value = name)
       @children << Constant.new(name, value, self)
+    end
+
+    def add_enum(name, ctype = nil)
+      enum = Enum.new(name, self, ctype)
+
+      yield enum
+
+      @children << enum
+
+      return enum
     end
   end
 
