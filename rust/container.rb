@@ -79,6 +79,14 @@ module Rust
 
       return enum
     end
-  end
 
+    def add_namespace(name, cname = name)
+      ns = Namespace.new(name, cname)
+
+      yield ns
+
+      @children << ns
+    end
+
+  end
 end
