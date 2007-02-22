@@ -39,6 +39,7 @@ module Rust
     end
 
     def add_expansion(key, value = key)
+      throw "missing @expansions array -- did you call Element.initialize?" unless @expansions
       @expansions << [key, value]
     end
 
