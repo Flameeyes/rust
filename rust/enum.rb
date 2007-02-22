@@ -45,7 +45,7 @@ module Rust
       @initialization_template = "!enum_values_init!"
 
       add_expansion 'enum_values_init',
-        '@values.collect { |name, value| "rb_define_const(!parent_varname!, \"!enum_name!\", cxx2ruby(#{value}));" }.join("\n")'
+        '@values.collect { |name, value| "rb_define_const(!parent_varname!, \"#{name}\", cxx2ruby(#{value}));" }.join("\n")'
       add_expansion 'enum_cases',
         '@values.collect { |name, value| "case #{value}:" }.join("\n")'
       add_expansion 'enum_name', '@name'
