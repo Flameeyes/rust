@@ -34,10 +34,10 @@ module Rust
 
       @cprefix = "#{@parent.cname}::" if @parent
       @cname = "#{@cprefix}#{@name}"
-      @cname = ctype if ctype
       
       @varname = "#{@cname.gsub("::", "_")}"
-
+      @cname = ctype if ctype
+  
       @values = []
 
       @declaration_template = Templates["EnumDeclarations"]

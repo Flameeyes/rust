@@ -49,7 +49,7 @@ module Rust
       @ptrmap = "#{@namespace.name.gsub("::", "_")}_#{@name}_ptrMap"
       @function_free = "#{varname}_free"
 
-      @cname = @namespace.cxxname ? "#{@namespace.cxxname}::#{@name}" : @name
+      @cname = @namespace.cname ? "#{@namespace.cname}::#{@name}" : @name
       @varcname = @cname.sub("*", "Ptr").gsub("::", "_").gsub(' ', '')
 
       @declaration_template = Templates["ClassDeclarations"]

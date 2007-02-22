@@ -66,7 +66,7 @@ module Rust
       
       @children_classes.each do |klass|
         ret << %@
-     if ( dynamic_cast< #{klass.namespace.cxxname}::#{klass.name}* >(instance) != NULL )
+     if ( dynamic_cast< #{klass.namespace.cname}::#{klass.name}* >(instance) != NULL )
      {
        klass = c#{klass.varname};
        #{klass.test_children}

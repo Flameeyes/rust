@@ -28,13 +28,13 @@ require 'rust/constants'
 module Rust
 
   class Namespace < Container
-    attr_reader :name, :cxxname, :varname
+    attr_reader :name, :cname, :varname
 
-    def initialize(name, cxxname)
+    def initialize(name, cname)
       super()
 
       @name = name
-      @cxxname = cxxname == "" ? nil : cxxname
+      @cname = cname == "" ? nil : cname
       @varname = "#{@name.gsub("::", "_")}"
 
       @declaration_template = Templates["ModuleDeclarations"]
