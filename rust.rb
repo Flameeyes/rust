@@ -53,13 +53,13 @@ module Rust
     @tpls_dir = (Pathname File.dirname(__FILE__)) + "rust/templates"
 
     def Templates.[](name)
-      return @cache[name] if @cache[name]
+      return @cache[name].dup if @cache[name]
 
       pn = @tpls_dir + "#{name}.rusttpl"
       raise "Template #{name} not found." unless pn.exist?
 
       @cache[name] = pn.read.gsub(/\/\/.*$\n?/, '')
-      return @cache[name]
+      return @cache[name].dup
     end
   end
 end
