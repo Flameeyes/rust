@@ -20,30 +20,35 @@
 # CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-require 'rust/container'
+require "rust/container"
 require "rust/cxxclass"
 require "rust/cwrapper"
-require 'rust/constants'
+require "rust/constants"
 
 module Rust
 
   class Namespace < Container
     attr_reader :name, :cname, :varname
 
-    def initialize(name, cname)
+    def initialize(name, cname, parent = nil)
       super()
 
       @name = name
+      
+      if parent.kind_of?(Namespace)
+        cname = "#{parent.cname}::#{cname}"
+      end
+      
       @cname = cname == "" ? nil : cname
       @varname = "#{@name.gsub("::", "_")}"
 
       @declaration_template = Templates["ModuleDeclarations"]
       @definition_template = Templates["ModuleDefinitions"]
-      unless @name.include?("::")
-        @initialization_template = "r!namespace_varname! = rb_define_module(\"!module_name!\");\n"
+      unless parent.kind_of?(Namespace)
+	  @initialization_template = "r!namespace_varname! = rb_define_module(\"!module_name!\");\n"
       else
         # TODO this should use the expansion
-        @initialization_template = "r!namespace_varname! = rb_define_module_under(r#{@name.split("::")[0..-2].join("_")}, \"#{@name.split("::").last}\");\n"
+        @initialization_template = "r!namespace_varname! = rb_define_module_under(r#{parent.cname}, \"#{@name}\");\n"
       end
 
       add_expansion 'module_name', 'name'

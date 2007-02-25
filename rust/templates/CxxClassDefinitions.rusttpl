@@ -18,6 +18,10 @@ VALUE r!class_varname!;
    return dynamic_cast< !c_class_name!* >((*it).second);
 }
 
+!c_class_name!& ruby2!class_varcname!(VALUE rval) {
+  return *ruby2!class_varcname!Ptr(rval);
+}
+
 VALUE cxx2ruby(!c_class_name!* instance) {
   if ( instance == NULL ) return Qnil;
 

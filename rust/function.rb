@@ -270,7 +270,11 @@ module Rust
     private :params_conversion
     
     def raw_call(nparam = nil)
-      "#{@name}(#{params_conversion(nparam)})"
+      if @parent.kind_of?(Namespace)
+          scope = "#{@parent.cname}::"
+      end
+      
+      "#{scope}#{@name}(#{params_conversion(nparam)})"
     end
     private :raw_call
     

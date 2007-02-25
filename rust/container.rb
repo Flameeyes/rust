@@ -81,7 +81,7 @@ module Rust
     end
 
     def add_namespace(name, cname = name)
-      ns = Namespace.new(name, cname)
+      ns = Namespace.new(name, cname, self)
 
       yield ns
 

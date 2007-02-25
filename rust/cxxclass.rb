@@ -85,7 +85,7 @@ module Rust
 
     class Constructor < Class::Constructor
       def raw_call(nparam = nil)
-        "tmp = new #{super(nparam)}"
+        "tmp = new #{@parent.namespace.cname}::#{super(nparam)}"
       end
     end
 

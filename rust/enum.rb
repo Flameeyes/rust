@@ -52,6 +52,7 @@ module Rust
       add_expansion 'enum_cname', '@cname'
       add_expansion 'enum_cprefix', '@cprefix'
       add_expansion 'enum_varname', '@varname'
+      add_expansion 'parent_varname', '"r#{@parent.varname}"'
     end
 
     def add_value(name, value="#{@cprefix}#{name}")
