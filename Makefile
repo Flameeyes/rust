@@ -9,4 +9,4 @@ check:
 	done
 
 doc:
-	rdoc -o rust-doc rust
+	rdoc -o rust-doc -t 'Rust Documentation' rust
