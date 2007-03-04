@@ -24,5 +24,6 @@ Hopefully in the future Rust can be used to easily produce Ruby
 bindings for a number of libraries that currently aren't available at
 all.
 
-To contact me, send me patches or comments, just write to
-<flameeyes@gmail.com> .
+To contact me, just write to <flameeyes@gmail.com> .
+To send patches (preferably in GIT format), subscribe and write to
+<rust-devel@rubyforge.org> mailing list.
