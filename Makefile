@@ -7,3 +7,6 @@ check:
 		unit=$${test#*/}; \
 		ruby -C test $${unit} || exit 0; \
 	done
+
+doc:
+	rdoc -o rust-doc rust
