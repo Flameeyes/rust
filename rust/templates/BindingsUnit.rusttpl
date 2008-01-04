@@ -31,7 +31,7 @@ using namespace Rust_!bindings_name!;
 
 extern "C" {
 
-#ifdef HAVE_VISIBILITY
+#if HAVE_VISIBILITY
 void Init_!bindings_name!() __attribute__((visibility("default")));
 #endif
 
